@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation.xml"
+    app:startDestination="@id/first_screen">
+
+    <fragment
+        android:id="@+id/first_screen"
+        android:name="com.example.guessmydraw.fragments.FirstScreen"
+        android:label="fragment_first_screen"
+        tools:layout="@layout/fragment_first_screen" >
+        <action
+            android:id="@+id/show_device_list"
+            app:destination="@id/device_list" />
+        <action
+            android:id="@+id/show_word_list"
+            app:destination="@id/wordList" />
+    </fragment>
+    <fragment
+        android:id="@+id/device_list"
+        android:name="com.example.guessmydraw.fragments.DeviceList"
+        android:tag="mylist"
+        android:label="fragment_device_list"
+        tools:layout="@layout/fragment_device_list" >
+        <action
+            android:id="@+id/start_game"
+            app:destination="@id/game_lobby" />
+        <action
+            android:id="@+id/show_device_list"
+            app:destination="@id/device_list" />
+    </fragment>
+    <fragment
+        android:id="@+id/game_lobby"
+        android:name="com.example.guessmydraw.fragments.GameLobby"
+        android:label="fragment_game_lobby"
+        tools:layout="@layout/fragment_game_lobby">
+        <action
+            android:id="@+id/start_current_player_games"
+            app:destination="@id/canvasCurrentPlayer" />
+        <action
+            android:id="@+id/start_other_player_games"
+            app:destination="@id/canvasOtherPlayer" />
+        <action
+            android:id="@+id/choose_word"
+            app:destination="@id/chooseWord" />
+    </fragment>
+    <fragment
+        android:id="@+id/canvasCurrentPlayer"
+        android:name="com.example.guessmydraw.fragments.CanvasCurrentPlayer"
+        android:label="fragment_canvas_current_player"
+        tools:layout="@layout/fragment_canvas_current_player" >
+        <argument
+            android:name="otherPlayerAddress"
+            app:argType="string" />
+        <argument
+            android:name="word"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_canvasCurrentPlayer_to_matchResult"
+            app:destination="@id/matchResult" />
+    </fragment>
+    <fragment
+        android:id="@+id/canvasOtherPlayer"
+        android:name="com.example.guessmydraw.fragments.CanvasOtherPlayer"
+        android:label="fragment_canvas_other_player"
+        tools:layout="@layout/fragment_canvas_other_player" >
+        <argument android:name="currentPlayerAddress"
+            app:argType="string" />
+        <argument
+            android:name="rightAnswer"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_canvasOtherPlayer_to_matchResult"
+            app:destination="@id/matchResult" />
+    </fragment>
+    <action
+        android:id="@+id/disconnection"
+        app:destination="@id/device_list"
+        app:popUpTo="@id/device_list"
+        app:popUpToInclusive="true" />
+    <fragment
+        android:id="@+id/winner"
+        android:name="com.example.guessmydraw.fragments.Winner"
+        android:label="fragment_winner"
+        tools:layout="@layout/fragment_winner" />
+    <fragment
+        android:id="@+id/gameOver"
+        android:name="com.example.guessmydraw.fragments.GameOver"
+        android:label="fragment_game_over"
+        tools:layout="@layout/fragment_game_over" />
+    <fragment
+        android:id="@+id/wordList"
+        android:name="com.example.guessmydraw.fragments.WordList"
+        android:label="WordList"
+        tools:layout="@layout/fragment_word_list">
+        <action
+            android:id="@+id/add_new_word"
+            app:destination="@id/newWord" />
+    </fragment>
+    <fragment
+        android:id="@+id/newWord"
+        android:name="com.example.guessmydraw.fragments.NewWord"
+        android:label="NewWord"
+        tools:layout="@layout/fragment_new_word">
+        <action
+            android:id="@+id/return_to_word_list"
+            app:destination="@id/wordList" />
+    </fragment>
+    <fragment
+        android:id="@+id/chooseWord"
+        android:name="com.example.guessmydraw.fragments.ChooseWord"
+        android:label="ChooseWord"
+        tools:layout="@layout/fragment_choose_word">
+        <action
+            android:id="@+id/return_word_to_lobby"
+            app:destination="@id/game_lobby" />
+    </fragment>
+    <fragment
+        android:id="@+id/matchResult"
+        android:name="com.example.guessmydraw.fragments.MatchResult"
+        android:label="fragment_match_result"
+        tools:layout="@layout/fragment_match_result" >
+        <action
+            android:id="@+id/action_matchResult_to_game_lobby"
+            app:destination="@id/game_lobby" />
+        <argument
+            android:name="isWin"
+            app:argType="boolean" />
+    </fragment>
+</navigation>
