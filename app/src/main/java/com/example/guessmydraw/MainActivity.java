@@ -288,7 +288,15 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Disconnected.");
-                Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.disconnection);
+
+                NavDestination dest = Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).getCurrentDestination();
+                if (dest == null) return;
+
+                String fragmentLabel = Objects.requireNonNull(dest.getLabel()).toString();
+                if (!fragmentLabel.equals(getResources().getString(R.string.match_results_label))){
+                    Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.disconnection);
+                }
+
             }
 
         });

@@ -91,6 +91,7 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
 
             sendEndingMessage();
             endMatch();
+            this.endMatchButton.setEnabled(false);
         });
 
         Button returnToLobbyButton = binding.returnToLobbyButton;

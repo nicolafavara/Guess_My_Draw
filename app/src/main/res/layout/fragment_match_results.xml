@@ -8,7 +8,7 @@
     tools:context=".fragments.MatchResults">
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/result_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
