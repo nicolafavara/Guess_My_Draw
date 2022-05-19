@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.databinding.FragmentNewWordBinding;
-import com.example.guessmydraw.databinding.FragmentWordListBinding;
 import com.example.guessmydraw.wordViewModel.Word;
 import com.example.guessmydraw.wordViewModel.WordViewModel;
 
@@ -49,7 +48,7 @@ public class NewWord extends Fragment {
         button.setOnClickListener( view -> {
             if (TextUtils.isEmpty(editText.getText())) {
 
-                Toast.makeText(requireContext(), R.string.empty_not_saved, Toast.LENGTH_LONG).show();
+                Toast.makeText(requireContext(), R.string.empty_word_not_saved, Toast.LENGTH_LONG).show();
             }
             else {
                 Word word = new Word(editText.getText().toString());

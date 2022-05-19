@@ -6,7 +6,6 @@ import android.os.Parcelable;
 public class AnswerMessage implements Parcelable {
 
     public static byte NET_ID = 2;
-
     private String answer;
 
     @Override

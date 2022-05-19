@@ -61,13 +61,14 @@ public class DeviceList extends Fragment implements WifiP2pManager.PeerListListe
         Log.d("DEBUG", "Creating adapter...");
         this.adapter = new RVAdapter(getContext());
         recyclerView.setAdapter(this.adapter);
+
+        //TODO "riorganizza riga"
         Objects.requireNonNull(recyclerView.getAdapter()).registerAdapterDataObserver(new EmptyListObserver(recyclerView, view.findViewById(R.id.empty_data_parent)));
         Log.d("DEBUG", "Adapter created.");
     }
 
     @Override
     public void onDestroyView() {
-        Log.d("DEBUG", "Explosion ! ! !");
         super.onDestroyView();
         binding = null;
     }
@@ -81,7 +82,7 @@ public class DeviceList extends Fragment implements WifiP2pManager.PeerListListe
             adapter.updateList(peerList);
         }
         else {
-            Log.d("DEBUG", "Adapter is null ! ! !");
+            Log.d("DEBUG", "Adapter is null.");
         }
 
         if (peerList.getDeviceList().size() == 0) {
@@ -99,6 +100,7 @@ public class DeviceList extends Fragment implements WifiP2pManager.PeerListListe
 
         clearPeers();
         ((DeviceActionListener) requireActivity()).refresh();
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     public interface DeviceActionListener {

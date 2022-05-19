@@ -32,11 +32,14 @@ public class Sender extends Thread {
     private final Queue<Bundle> enqueuedMessages = new LinkedList<>();
 
     public Sender(String destName){
+        assert destName != null;
         this.destName = destName;
     }
 
     @Override
     public void run() {
+
+        Log.d("Sender", "START RUUUUUUUUUUUUUUUUUNNING");
 
         try {
             this.senderSocket = new DatagramSocket();

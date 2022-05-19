@@ -4,16 +4,26 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDestination;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import com.example.guessmydraw.R;
 import com.example.guessmydraw.databinding.FragmentFirstScreenBinding;
+import com.example.guessmydraw.utilities.GameViewModel;
+
+import java.util.Objects;
 
 public class FirstScreen extends Fragment {
 
     private FragmentFirstScreenBinding binding;
+    private EditText playersNameEditText;
 
     public FirstScreen() {
         // Required empty public constructor
@@ -29,12 +39,30 @@ public class FirstScreen extends Fragment {
 
         binding = FragmentFirstScreenBinding.inflate(inflater, container, false);
 
+        playersNameEditText = binding.playerName;
+
         binding.discoverButton.setOnClickListener(view -> {
-            ((FirstScreenListener) requireActivity()).startDiscovery();
+            String name = playersNameEditText.getText().toString();
+            if(!name.equals("")){
+                GameViewModel gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
+                gameViewModel.setPlayersName(name);
+
+                ((FirstScreenListener) requireActivity()).startDiscovery();
+            }
+            else{
+                Toast.makeText(requireActivity(), R.string.insert_name_string, Toast.LENGTH_LONG).show();
+            }
         });
 
         binding.showWordButton.setOnClickListener(view -> {
-            ((FirstScreenListener) requireActivity()).showWordList();
+
+            NavDestination dest = NavHostFragment.findNavController(this).getCurrentDestination();
+            if (dest == null) return;
+
+            String fragmentLabel = Objects.requireNonNull(dest.getLabel()).toString();
+            if (fragmentLabel.equals(requireContext().getString(R.string.first_screen_label))){
+                NavHostFragment.findNavController(this).navigate(R.id.show_word_list);
+            }
         });
 
         return binding.getRoot();
@@ -43,6 +71,5 @@ public class FirstScreen extends Fragment {
     public interface FirstScreenListener {
 
         void startDiscovery();
-        void showWordList();
     }
 }

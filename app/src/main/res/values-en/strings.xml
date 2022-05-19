@@ -3,8 +3,8 @@
     <string name="app_name">GuessMyDraw</string>
     <string name="on_off_button">On/Off</string>
     <string name="discover_button">searching for a player</string>
-    <string name="si">Yes</string>
-    <string name="annulla">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="cancel">Cancel</string>
     <string name="list_empty">searching for a player…</string>
     <string name="guess_my_draw">Guess My Draw!!!</string>
     <string name="Lobby">Lobby</string>
@@ -16,13 +16,20 @@
     <string name="start_game">Play</string>
     <string name="draw">Draw</string>
     <string name="guess">Guess</string>
-    <string name="hint_word">Answer...</string>
+    <string name="answer_hint">Answer...</string>
     <string name="add_word">add word</string>
     <string name="show_word_list">word list</string>
     <string name="button_save">Save</string>
     <string name="hello_blank_fragment">Hello Blank fragment</string>
-    <string name="empty_not_saved">Word not saved because it is empty.</string>
+    <string name="empty_word_not_saved">Word not saved because it is empty.</string>
     <string name="choose_word">Choose a word</string>
     <string name="your_turn">It\'s your turn to:</string>
     <string name="button_send">Send</string>
+    <string name="return_to_lobby">return to lobby</string>
+    <string name="partial_results">Partial results</string>
+    <string name="loading_text">Loading...</string>
+    <string name="player_name_hint">Player\'s name</string>
+    <string name="insert_name_string">First enter the name you will use during the game</string>
+    <string name="end_match">End Match</string>
+    <string name="return_to_first_screen">Go on</string>
 </resources>

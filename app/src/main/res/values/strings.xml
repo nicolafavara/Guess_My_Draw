@@ -1,11 +1,26 @@
 <resources>
+    <!--  fragment's labels  -->
+    <string name="first_screen_label" translatable="false">first_screen</string>
+    <string name="device_list_label" translatable="false">device_list</string>
+    <string name="game_lobby_label" translatable="false">game_lobby</string>
+    <string name="canvas_current_player_label" translatable="false">canvas_current_player</string>
+    <string name="canvas_other_player_label" translatable="false">canvas_other_player</string>
+    <string name="match_results_label" translatable="false">match_results</string>
+    <string name="game_over_label" translatable="false">game_over</string>
+    <string name="word_list_label" translatable="false">word_list</string>
+    <string name="new_word_label" translatable="false">new_word</string>
+    <string name="choose_word_label" translatable="false">choose_word</string>
+    <string name="partial_results_label" translatable="false">partial_results</string>
+    <string name="loading_label" translatable="false">loading</string>
+
+    <!-- strings -->
     <string name="app_name">GuessMyDraw</string>
     <string name="on_off_button">On/Off</string>
     <string name="discover_button">Ricerca Giocatore</string>
     <string name="p2p_off_warning">Abilita il WiFi Direct dalle impostazioni.</string>
     <string name="conferm_disconnection">Vuoi scollegarti dall\'attuale dispositivo e tornare alla lista dei dispositivi disponibili?</string>
-    <string name="si">Si</string>
-    <string name="annulla">Annulla</string>
+    <string name="yes">Si</string>
+    <string name="cancel">Annulla</string>
     <string name="list_empty">In attesa di giocatori nelle vicinanze…</string>
     <string name="Lobby">Lobby di gioco</string>
     <string name="guess_my_draw">Guess My Draw!!!</string>
@@ -15,13 +30,20 @@
     <string name="start_game">Gioca</string>
     <string name="draw">Disegnare</string>
     <string name="guess">Indovinare</string>
-    <string name="hint_word">Risposta...</string>
+    <string name="answer_hint">Risposta…</string>
+    <string name="player_name_hint">Nome giocatore</string>
     <string name="add_word">aggiungi una parola</string>
     <string name="show_word_list">lista di parole</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="button_save">Salva</string>
-    <string name="empty_not_saved">Non puoi salvare una stringa vuota</string>
+    <string name="empty_word_not_saved">Non puoi salvare una stringa vuota</string>
     <string name="choose_word">scegli una parola</string>
     <string name="your_turn">E\' il tuo turno per:</string>
     <string name="button_send">Invia</string>
+    <string name="return_to_lobby">torna alla lobby</string>
+    <string name="partial_results">Risultati parziali</string>
+    <string name="loading_text">Caricamento…</string>
+    <string name="insert_name_string">Inserisci prima il nome che userai durante la partita</string>
+    <string name="end_match">Termina partita</string>
+    <string name="return_to_first_screen">Avanti</string>
 </resources>

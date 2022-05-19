@@ -1,7 +1,5 @@
 package com.example.guessmydraw.fragments;
 
-import android.net.wifi.p2p.WifiP2pInfo;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -9,7 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -23,39 +22,38 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.messages.AnswerMessage;
 import com.example.guessmydraw.connection.messages.DrawMessage;
-import com.example.guessmydraw.connection.messages.HandshakeMessage;
 import com.example.guessmydraw.connection.NetworkEventCallback;
 import com.example.guessmydraw.connection.Sender;
 import com.example.guessmydraw.databinding.FragmentGameLobbyBinding;
 import com.example.guessmydraw.utilities.DisconnectionDialog;
+import com.example.guessmydraw.utilities.GameViewModel;
 
 import java.net.InetAddress;
+import java.util.Objects;
 
-public class GameLobby extends Fragment implements WifiP2pManager.ConnectionInfoListener, NetworkEventCallback {
+public class GameLobby extends Fragment implements NetworkEventCallback {
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-
     private FragmentGameLobbyBinding binding;
-    private String groupOwnerAddress = null;
+    private final String LOG_STRING_GAME_LOBBY = "GAME_LOBBY";
+
     private Button playButton;
     private Button chooseWordButton;
 
     private TextView roleTextView;
     private TextView wordTextView;
     private MutableLiveData<String> chosenWord;
-    private String answer = null;
 
-    private boolean isMyTurnToDraw = false;
-    private boolean isGroupOwner = false;
-    private String peerAddress;
+    private boolean groupOwnerFlag = false;
+    private String opponentAddress;
 
     private Sender sender;
     private Receiver receiver;
+    private GameViewModel gameViewModel;
 
     public GameLobby() {
         this.receiver = new Receiver(this);
@@ -65,8 +63,6 @@ public class GameLobby extends Fragment implements WifiP2pManager.ConnectionInfo
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Log.d("DEBUG", "inside onCreate() ! ! !");
 
         // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -82,6 +78,7 @@ public class GameLobby extends Fragment implements WifiP2pManager.ConnectionInfo
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         binding = FragmentGameLobbyBinding.inflate(inflater, container, false);
 
@@ -91,33 +88,37 @@ public class GameLobby extends Fragment implements WifiP2pManager.ConnectionInfo
         this.wordTextView.setText("");
 
         this.chooseWordButton = binding.chooseWordButton;
-        this.chooseWordButton.setVisibility(View.GONE);
-        this.chooseWordButton.setEnabled(false);
+        this.chooseWordButton.setEnabled(true);
+        this.chooseWordButton.setVisibility(View.INVISIBLE);
         this.chooseWordButton.setOnClickListener(view -> {
-            NavHostFragment.findNavController(this).navigate(R.id.choose_word);
+
+            // TODO: FARE IN QUESTO MODO ANCHE IN ALTRI CASI
+            NavDestination dest = NavHostFragment.findNavController(this).getCurrentDestination();
+            if (dest == null) return;
+
+            String fragmentLabel = Objects.requireNonNull(dest.getLabel()).toString();
+            if (fragmentLabel.equals(requireContext().getString(R.string.game_lobby_label))){
+                NavHostFragment.findNavController(this).navigate(R.id.start_word_list);
+            }
         });
 
         this.playButton = binding.playButton;
         this.playButton.setEnabled(false);
         this.playButton.setOnClickListener(view -> {
 
-            if (isMyTurnToDraw){
+            Log.d(LOG_STRING_GAME_LOBBY, "isMyTurnToDraw " +  gameViewModel.getMyTurnToDraw() + ". ");
+            if (gameViewModel.getMyTurnToDraw()){
                 if (chosenWord != null){
-                    GameLobbyDirections.StartCurrentPlayerGames action = GameLobbyDirections.startCurrentPlayerGames(this.peerAddress, chosenWord.getValue());
-                    Log.d("DEBUG", "changing to current player canvas fragment");
-                    NavHostFragment.findNavController(this).navigate(action);
+                    NavHostFragment.findNavController(this).navigate(R.id.start_current_player_games);
                 }
                 else{
                     Toast.makeText(requireActivity(), "Prima di iniziare, scegli una parola da disegnare", Toast.LENGTH_LONG).show();
                 }
             }
             else{
-                GameLobbyDirections.StartOtherPlayerGames action = GameLobbyDirections.startOtherPlayerGames(this.groupOwnerAddress, this.answer);
-                Log.d("DEBUG", "changing to other player canvas fragment");
-                NavHostFragment.findNavController(this).navigate(action);
+                NavHostFragment.findNavController(this).navigate(R.id.start_other_player_games);
             }
         });
-
         return binding.getRoot();
     }
 
@@ -130,61 +131,72 @@ public class GameLobby extends Fragment implements WifiP2pManager.ConnectionInfo
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ((GameCallback) requireActivity()).askForConnectionInfo(this);
+        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
+        groupOwnerFlag = gameViewModel.getGroupOwnerFlag();
+        opponentAddress = gameViewModel.getOpponentAddress();
+        assert opponentAddress != null;
+        Log.d(LOG_STRING_GAME_LOBBY, "STARTING SENDER WITH ADDRESS: " + opponentAddress);
+        this.sender = new Sender(opponentAddress);
+        this.sender.start();
 
         this.chosenWord = Navigation.findNavController(requireActivity(), R.id.my_nav_host_fragment)
                                 .getCurrentBackStackEntry().getSavedStateHandle().getLiveData("chosenWord");
-        this.chosenWord.observe(getViewLifecycleOwner(), s -> {
-            Log.d("DEBUG", "chosenWord changed: " + s + "(" + chosenWord.getValue() + ")");
-            // Do something with the result.
-            sendAnswer(chosenWord.getValue());
+        this.chosenWord.observe(getViewLifecycleOwner(), word -> {
+
+            Log.d(LOG_STRING_GAME_LOBBY, "chosenWord changed: " + word + "(" + chosenWord.getValue() + ")");
+            sendAnswer(word);
+            gameViewModel.setChoosenWord(word);
             mainHandler.post(()->{
-                // enable button to choose word only after the current player has obtained
-                // the IP of the other player to be able to send him the correct answer
+                this.roleTextView.setText(R.string.draw);
+                this.wordTextView.setText(word);
+                this.chooseWordButton.setVisibility(View.VISIBLE);
+                this.chooseWordButton.setEnabled(false);
                 this.playButton.setEnabled(true);
             });
         });
-    }
 
-    @Override
-    public void onConnectionInfoAvailable(WifiP2pInfo info) {
-
-        if (info.groupOwnerAddress != null) {
-
-            Log.d("DEBUG", "indirizzo Owner del gruppo: " + info.groupOwnerAddress.getHostAddress());
-            // String from WifiP2pInfo struct
-            this.groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
-
-            Log.d("DEBUG", "info.groupFormed: " + info.groupFormed + "info.isGroupOwner: " + info.isGroupOwner);
-            if (info.groupFormed && info.isGroupOwner) { //we are the group owner
-
-                isGroupOwner = true;
-                isMyTurnToDraw = true;
-                this.roleTextView.setText(R.string.draw);
-                this.chooseWordButton.setVisibility(View.VISIBLE);
-            }
-            else if (info.groupFormed) { //we are a peer
-
-                this.sender = new Sender(groupOwnerAddress);
-                this.sender.start();
-                //sends a packet to the group owner to let him know the IP address of the peer
-                sendAddress();
-                this.roleTextView.setText(R.string.guess);
-
-            }
+        if(chosenWord.getValue() == null){
+            determCurrent();
         }
     }
 
-    /**
-     * used by Peer to send address to the GroupOwner
-     */
-    private void sendAddress() {
+    private void determCurrent(){
 
-        Log.d("DEBUG", "sending address to other player.");
-        HandshakeMessage messageToSend = new HandshakeMessage();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
-        this.sender.sendMessage(bundle);
+        int currRound = gameViewModel.getRoundNumber();
+        Log.d(LOG_STRING_GAME_LOBBY, "Current round is " + currRound);
+
+        if(currRound == 0){
+            Log.d(LOG_STRING_GAME_LOBBY, "first round.");
+            if(groupOwnerFlag){
+
+                Log.d(LOG_STRING_GAME_LOBBY, "Time to Draw!");
+                gameViewModel.setMyTurnToDraw(true);
+                this.roleTextView.setText(R.string.draw);
+                this.chooseWordButton.setVisibility(View.VISIBLE);
+            }
+            else{
+                Log.d(LOG_STRING_GAME_LOBBY, "Time to Guess!");
+                gameViewModel.setMyTurnToDraw(false);
+                this.roleTextView.setText(R.string.guess);
+            }
+        }
+        else{
+            Log.d(LOG_STRING_GAME_LOBBY, "Round " + currRound + ". ");
+            boolean wasMyTurnToDraw = gameViewModel.getMyTurnToDraw();
+            Log.d(LOG_STRING_GAME_LOBBY, "wasMyTurnToDraw " +  gameViewModel.getMyTurnToDraw() + ". ");
+            if(wasMyTurnToDraw){
+
+                Log.d(LOG_STRING_GAME_LOBBY, "Time to Guess!");
+                gameViewModel.setMyTurnToDraw(false);
+                this.roleTextView.setText(R.string.guess);
+            }
+            else{
+                Log.d(LOG_STRING_GAME_LOBBY, "Time to Draw!");
+                gameViewModel.setMyTurnToDraw(true);
+                this.roleTextView.setText(R.string.draw);
+                this.chooseWordButton.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     /**
@@ -194,7 +206,7 @@ public class GameLobby extends Fragment implements WifiP2pManager.ConnectionInfo
 
         if(chosenWord != null){
 
-            Log.d("DEBUG", "sending answer(" + answer + ") to other player.");
+            Log.d(LOG_STRING_GAME_LOBBY, "sending answer(" + answer + ") to other player.");
             AnswerMessage messageToSend = new AnswerMessage();
             messageToSend.setAnswer(answer);
             Bundle bundle = new Bundle();
@@ -202,31 +214,14 @@ public class GameLobby extends Fragment implements WifiP2pManager.ConnectionInfo
             this.sender.sendMessage(bundle);
         }
         else
-            Log.d("DEBUG", "chosen word not sent because null. ");
-    }
-
-    @Override
-    public void onHandshakeMessageReceived(InetAddress address) {
-
-        Log.d("DEBUG", "received peer address: " + address.getHostAddress());
-        peerAddress = address.getHostAddress();
-
-        this.sender = new Sender(peerAddress);
-        this.sender.start();
-
-        mainHandler.post(()->{
-            // enable button to choose word only after the current player has obtained
-            // the IP of the other player to be able to send him the correct answer
-            chooseWordButton.setEnabled(true);
-        });
+            Log.d(LOG_STRING_GAME_LOBBY, "chosen word not sent because null. ");
     }
 
     @Override
     public void onAnswerMessageReceived(String answer) {
 
-        Log.d("DEBUG", "answer received (" + answer + ").");
-        this.answer = answer;
-
+        Log.d(LOG_STRING_GAME_LOBBY, "answer received (" + answer + ").");
+        gameViewModel.setChoosenWord(answer);
         mainHandler.post(()->{
             // enable button to choose word only after the current player has obtained
             // the IP of the other player to be able to send him the correct answer
@@ -235,12 +230,18 @@ public class GameLobby extends Fragment implements WifiP2pManager.ConnectionInfo
     }
 
     @Override
+    public void onHandshakeMessageReceived(InetAddress address, String opponentsName) { /*EMPTY*/}
+
+    @Override
     public void onWinMessageReceived() {/*EMPTY*/}
+
+    @Override
+    public void onTimerExpiredMessage() {/*EMPTY*/}
+
+    @Override
+    public void onEndingMessageReceived() {/*EMPTY*/}
 
     @Override
     public void onDrawMessageReceived(DrawMessage msg) {/*EMPTY*/}
 
-    public interface GameCallback {
-        void askForConnectionInfo(WifiP2pManager.ConnectionInfoListener listener);
-    }
 }

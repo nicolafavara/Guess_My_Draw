@@ -132,7 +132,6 @@ public final class CurrentPlayerCanvasView extends View {
 
     /*method to send message*/
 
-
     private void sendTouchStartMessage(float motionTouchEventX, float motionTouchEventY){
 
         Fragment frag = ((MainActivity) getContext()).getForegroundFragment();

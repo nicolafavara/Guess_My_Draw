@@ -6,6 +6,8 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -15,20 +17,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.NetworkEventCallback;
 import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.Sender;
 import com.example.guessmydraw.databinding.FragmentCanvasCurrentPlayerBinding;
 import com.example.guessmydraw.utilities.DisconnectionDialog;
+import com.example.guessmydraw.utilities.GameViewModel;
 
 import java.net.InetAddress;
 
  public class CanvasCurrentPlayer extends Fragment implements NetworkEventCallback {
 
-     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private FragmentCanvasCurrentPlayerBinding binding;
-    private String otherPlayerAddress;
+    private String opponentPlayerAddress;
     private String correctAnswer;
 
     private DrawMessage messageToSend;
@@ -36,9 +40,9 @@ import java.net.InetAddress;
     private Receiver receiver;  //receiver for the answer sent from other player
     private Bundle bundle;
 
-    public CanvasCurrentPlayer() {
-        // Required empty public constructor
-    }
+    private GameViewModel gameViewModel;
+
+    public CanvasCurrentPlayer() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,10 +76,12 @@ import java.net.InetAddress;
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        this.otherPlayerAddress = CanvasCurrentPlayerArgs.fromBundle(getArguments()).getOtherPlayerAddress();
-        this.correctAnswer = CanvasCurrentPlayerArgs.fromBundle(getArguments()).getWord();
-        Log.d("DEBUG", "CanvasCurrentPlayer: otherPlayerAddress è = " + otherPlayerAddress);
-        this.sender = new Sender(otherPlayerAddress);
+        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
+
+        this.opponentPlayerAddress = gameViewModel.getOpponentAddress();
+        Log.d("DEBUG", "CanvasCurrentPlayer: otherPlayerAddress è = " + opponentPlayerAddress);
+        this.correctAnswer = gameViewModel.getChoosenWord();
+        this.sender = new Sender(opponentPlayerAddress);
         this.sender.start();
         
         this.receiver = new Receiver(this);
@@ -102,16 +108,30 @@ import java.net.InetAddress;
      @Override
      public void onWinMessageReceived() {
 
+         gameViewModel.updateScorePlayerTwo();
+
          mainHandler.post(()->{
-             Toast.makeText(getContext(), "Il tuo avversario ha indovinato!", Toast.LENGTH_SHORT).show();
+             Toast.makeText(getContext(), "Il tuo avversario ha indovinato!", Toast.LENGTH_LONG).show();
+             NavHostFragment.findNavController(this).navigate(R.id.end_round);
          });
      }
+
+     @Override
+     public void onTimerExpiredMessage() {
+         mainHandler.post(()->{
+             Toast.makeText(getContext(), "Il tuo avversario ha perso!", Toast.LENGTH_LONG).show();
+             NavHostFragment.findNavController(this).navigate(R.id.end_round);
+         });
+     }
+
+     @Override
+     public void onEndingMessageReceived() {/*EMPTY*/}
 
      @Override
      public void onAnswerMessageReceived(String answer) {/*EMPTY*/}
 
      @Override
-     public void onHandshakeMessageReceived(InetAddress address) {/*EMPTY*/}
+     public void onHandshakeMessageReceived(InetAddress address, String opponentsName) {/*EMPTY*/}
      
      @Override
      public void onDrawMessageReceived(DrawMessage msg) {/*EMPTY*/}

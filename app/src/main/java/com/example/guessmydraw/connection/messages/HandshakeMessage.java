@@ -6,6 +6,7 @@ import android.os.Parcelable;
 public class HandshakeMessage implements Parcelable {
 
     public static byte NET_ID = 0;
+    private String playersName;
 
     @Override
     public int describeContents() {
@@ -14,16 +15,29 @@ public class HandshakeMessage implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+
         dest.writeByte(NET_ID);
+        dest.writeString(this.playersName);
     }
 
     public void readFromParcel(Parcel source) {
+        this.playersName = source.readString();
     }
 
     public HandshakeMessage() {
     }
 
     protected HandshakeMessage(Parcel in) {
+        in.readByte(); // dropped
+        this.playersName = in.readString();
+    }
+
+    public String getPlayersName() {
+        return playersName;
+    }
+
+    public void setPlayersName(String playersName) {
+        this.playersName = playersName;
     }
 
     public static final Creator<HandshakeMessage> CREATOR = new Creator<HandshakeMessage>() {

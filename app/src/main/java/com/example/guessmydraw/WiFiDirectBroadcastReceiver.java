@@ -19,6 +19,7 @@ import androidx.navigation.Navigation;
 import com.example.guessmydraw.fragments.DeviceList;
 import com.example.guessmydraw.fragments.FirstScreen;
 import com.example.guessmydraw.fragments.GameLobby;
+import com.example.guessmydraw.fragments.Loading;
 
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
@@ -85,13 +86,13 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 activity.isWifiP2pConnected = true;
 
                 Fragment frag = activity.getForegroundFragment();
-                if(frag != null && frag.toString().startsWith(gameClassName)){
+                if(frag != null && frag.toString().startsWith(Loading.class.getSimpleName())){
                     Log.d(MainActivity.TAG, "requesting connection info...");
                     WifiP2pManager.ConnectionInfoListener listener = (WifiP2pManager.ConnectionInfoListener) frag;
                     manager.requestConnectionInfo(channel, listener);
                 }
                 else if(frag != null && frag.toString().startsWith(deviceListClassName)){
-                    Navigation.findNavController(activity, R.id.my_nav_host_fragment).navigate(R.id.start_game);
+                    Navigation.findNavController(activity, R.id.my_nav_host_fragment).navigate(R.id.start_loading_page);
                 }
 
             }

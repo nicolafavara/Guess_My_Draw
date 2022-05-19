@@ -4,7 +4,9 @@ import android.util.Log;
 
 import com.example.guessmydraw.connection.messages.AnswerMessage;
 import com.example.guessmydraw.connection.messages.DrawMessage;
+import com.example.guessmydraw.connection.messages.EndingMessage;
 import com.example.guessmydraw.connection.messages.HandshakeMessage;
+import com.example.guessmydraw.connection.messages.TimerExpiredMessage;
 import com.example.guessmydraw.connection.messages.WinMessage;
 
 import java.io.IOException;
@@ -40,30 +42,39 @@ public class Receiver extends Thread{
                 // rimane in attesa della risposta del server fino allo scadere del timeout
                 client.receive(receivedPacket);
 
-                Log.d("DEBUG-Receiver", "packet received.");
-
                 byte[] bf = receivedPacket.getData();
                 byte type = bf[0];
 
                 if (type == DrawMessage.NET_ID) {
+                    Log.d("DEBUG-Receiver", "packet DrawMessage received.");
                     DrawMessage receivedMessage = ParcelableUtil.unmarshall(bf, DrawMessage.CREATOR);
                     callback.onDrawMessageReceived(receivedMessage);
                 }
                 else if (type == HandshakeMessage.NET_ID) {
-                    callback.onHandshakeMessageReceived(receivedPacket.getAddress());
+                    Log.d("DEBUG-Receiver", "packet HandshakeMessage received.");
+                    String opponentsName = ParcelableUtil.unmarshall(bf, HandshakeMessage.CREATOR).getPlayersName();
+                    callback.onHandshakeMessageReceived(receivedPacket.getAddress(), opponentsName);
                 }
                 else if (type == AnswerMessage.NET_ID) {
+                    Log.d("DEBUG-Receiver", "packet AnswerMessage received.");
                     String answer = ParcelableUtil.unmarshall(bf, AnswerMessage.CREATOR).getAnswer();
                     callback.onAnswerMessageReceived(answer);
                 }
                 else if (type == WinMessage.NET_ID) {
+                    Log.d("DEBUG-Receiver", "packet WinMessage received.");
                     callback.onWinMessageReceived();
                 }
-                else {
-                    throw new RuntimeException("Boh, I don't know the NET ID!");
+                else if (type == TimerExpiredMessage.NET_ID) {
+                    Log.d("DEBUG-Receiver", "packet TimerExpiredMessage received.");
+                    callback.onTimerExpiredMessage();
                 }
-
-                //Log.d("DEBUG", receivedMessage.toString());
+                else if (type == EndingMessage.NET_ID) {
+                    Log.d("DEBUG-Receiver", "packet EndingMessage received.");
+                    callback.onEndingMessageReceived();
+                }
+                else {
+                    throw new RuntimeException("Unknown NET ID!");
+                }
 
             }
 

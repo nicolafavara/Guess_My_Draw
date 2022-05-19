@@ -5,8 +5,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDestination;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -25,10 +28,13 @@ import android.widget.Toast;
 import com.example.guessmydraw.databinding.ActivityMainBinding;
 import com.example.guessmydraw.fragments.DeviceList;
 import com.example.guessmydraw.fragments.FirstScreen;
-import com.example.guessmydraw.fragments.GameLobby;
+import com.example.guessmydraw.fragments.Loading;
+import com.example.guessmydraw.utilities.GameViewModel;
+
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
-        implements FirstScreen.FirstScreenListener, DeviceList.DeviceActionListener, GameLobby.GameCallback {
+        implements FirstScreen.FirstScreenListener, DeviceList.DeviceActionListener, Loading.GameCallback {
 
     static final String TAG = "DEBUG_MainActivity";
 
@@ -43,6 +49,8 @@ public class MainActivity extends AppCompatActivity
     private BroadcastReceiver receiver = null;
     private ActivityMainBinding binding;
 
+    private GameViewModel gameViewModel;
+
     // Register the permissions callback, which handles the user's response to the
     // system permissions dialog. Save the return value, an instance of
     // ActivityResultLauncher, as an instance variable.
@@ -53,16 +61,6 @@ public class MainActivity extends AppCompatActivity
                     finish();
                 }
             });
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // TODO è corretto farlo sempre?
-        if (isWifiP2pConnected){
-            disconnect();
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +85,7 @@ public class MainActivity extends AppCompatActivity
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
 
+        gameViewModel = new ViewModelProvider(this).get(GameViewModel.class);
     }
 
     /**
@@ -181,10 +180,8 @@ public class MainActivity extends AppCompatActivity
         //Check if user is already connected with someone
         if (isWifiP2pConnected){
             Toast.makeText(this, R.string.p2p_already_connected, Toast.LENGTH_LONG).show();
-
             //TODO rimuovere disconnect(?)
             disconnect();
-            //return false;
         }
 
         //check if WiFi is enabled
@@ -221,14 +218,22 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess() {
+//                VECCHIO CODICE
+//                NavOptions navOptions = null;
+//                if(isRefreshing){
+//                    navOptions = new NavOptions.Builder().setPopUpTo(R.id.device_list, true).build();
+//                    isRefreshing = false;
+//                }
+//                Log.d("DEBUG", "show device list...");
+//                Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.show_device_list,null, navOptions);
 
-                NavOptions navOptions = null;
-                if(isRefreshing){
-                    navOptions = new NavOptions.Builder().setPopUpTo(R.id.device_list, true).build();
-                    isRefreshing = false;
+                NavDestination dest = Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).getCurrentDestination();
+                if (dest == null) return;
+
+                String fragmentLabel = Objects.requireNonNull(dest.getLabel()).toString();
+                if (fragmentLabel.equals(getResources().getString(R.string.first_screen_label))){
+                    Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.show_device_list);
                 }
-                Log.d("DEBUG", "show device list...");
-                Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.show_device_list,null, navOptions);
             }
 
             @Override
@@ -237,12 +242,6 @@ public class MainActivity extends AppCompatActivity
                 Log.d("DEBUG", "Discovery Failed : " + reasonCode);
             }
         });
-    }
-
-    @Override
-    public void showWordList() {
-
-        Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.show_word_list);
     }
 
     @Override
@@ -265,9 +264,8 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess() {
-                // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
                 //TODO assicurarsi ci si trovi nel fragment giusto prima
-                Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.start_game);
+                Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.start_loading_page);
             }
 
             @Override
@@ -280,28 +278,17 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void disconnect() {
 
-        //JustHello fragment = (JustHello) getSupportFragmentManager().findFragmentById(R.id.just_hello);
-        //fragment.resetViews();
         manager.removeGroup(channel, new WifiP2pManager.ActionListener() {
 
             @Override
             public void onFailure(int reasonCode) {
                 Log.d(TAG, "Disconnect failed. Reason :" + reasonCode);
-
             }
 
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Disconnected.");
-
-                //TODO REMOVE IF
-                Fragment frag = getForegroundFragment();
-                if(frag != null && frag.toString().startsWith("FirstScreen")){
-
-                    NavOptions navOptions = new NavOptions.Builder().setPopUpTo(R.id.game_lobby, true).build();
-                    Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.disconnection, null, navOptions);
-                }
-
+                Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.disconnection);
             }
 
         });

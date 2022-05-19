@@ -9,7 +9,7 @@
         <entry key="app/src/main/res/layout/device_card.xml" value="0.1" />
         <entry key="app/src/main/res/layout/device_list_empty.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_canvas_current_player.xml" value="0.1483539974348012" />
-        <entry key="app/src/main/res/layout/fragment_canvas_other_player.xml" value="0.34791454730417093" />
+        <entry key="app/src/main/res/layout/fragment_canvas_other_player.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_canvas_player_one.xml" value="0.35625" />
         <entry key="app/src/main/res/layout/fragment_canvas_player_two.xml" value="0.35625" />
         <entry key="app/src/main/res/layout/fragment_choose_word.xml" value="0.29243266353142366" />
@@ -18,8 +18,11 @@
         <entry key="app/src/main/res/layout/fragment_game.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_game_lobby.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_game_over.xml" value="0.29243266353142366" />
+        <entry key="app/src/main/res/layout/fragment_loading.xml" value="0.29243266353142366" />
         <entry key="app/src/main/res/layout/fragment_match_result.xml" value="0.29243266353142366" />
+        <entry key="app/src/main/res/layout/fragment_match_results.xml" value="0.29243266353142366" />
         <entry key="app/src/main/res/layout/fragment_new_word.xml" value="0.29243266353142366" />
+        <entry key="app/src/main/res/layout/fragment_partial_results.xml" value="0.29243266353142366" />
         <entry key="app/src/main/res/layout/fragment_winner.xml" value="0.14920906370243694" />
         <entry key="app/src/main/res/layout/fragment_word_list.xml" value="0.25" />
         <entry key="app/src/main/res/layout/other_player_canvas.xml" value="0.18177083333333333" />

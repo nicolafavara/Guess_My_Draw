@@ -20,11 +20,12 @@ public class DisconnectionDialog extends DialogFragment {
 
         return new AlertDialog.Builder(requireContext())
                 .setMessage(getString(R.string.conferm_disconnection))
-                .setNegativeButton(getString(R.string.annulla), null)
-                .setPositiveButton(getString(R.string.si), (dialog, which) -> {
+                .setNegativeButton(getString(R.string.cancel), null)
+                .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
 
                     FragmentActivity activity = getActivity();
                     if (activity != null){
+                        //TODO CAMBIARE
                         ((DeviceList.DeviceActionListener) activity).disconnect();
                     }
                     else {

@@ -13,7 +13,7 @@
     tools:ignore="RtlHardcoded">
 
     <TextView
-        android:id="@+id/loading_text"
+        android:id="@+id/game_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/list_empty"

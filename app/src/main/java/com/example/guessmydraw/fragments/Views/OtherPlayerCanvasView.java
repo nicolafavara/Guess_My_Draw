@@ -2,27 +2,27 @@ package com.example.guessmydraw.fragments.Views;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.NetworkEventCallback;
+import com.example.guessmydraw.fragments.CanvasCurrentPlayer;
+import com.example.guessmydraw.fragments.CanvasOtherPlayer;
+import com.example.guessmydraw.utilities.GameTimer;
 
-import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
 
 import java.net.InetAddress;
 
@@ -34,23 +34,20 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
 
     private final Paint paint;
     private final Path path;
-
     private Canvas extraCanvas;
     private Bitmap extraBitmap;
-    private Bitmap scaledBitmap;
-
     private final int backgroundColor;
 
     private final Receiver receiver;
+
+    private boolean isFirstMessageReceived = true;
 
     public OtherPlayerCanvasView(Context context, AttributeSet attrs){
 
         super(context, attrs);
         setSaveEnabled(true);
         this.backgroundColor = ResourcesCompat.getColor(this.getResources(), R.color.page_color, null);
-
         int drawColor = ResourcesCompat.getColor(this.getResources(), R.color.black, null);
-
         this.path = new Path();
         this.paint = new Paint();
         this.paint.setColor(drawColor);
@@ -60,7 +57,6 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
         this.paint.setStrokeJoin(Paint.Join.ROUND);
         this.paint.setStrokeCap(Paint.Cap.ROUND);
         this.paint.setStrokeWidth(12.0F);
-
 
         this.receiver = new Receiver(this);
         this.receiver.start();
@@ -93,6 +89,15 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
 
         Log.d("DEBUG", message.toString());
 
+        if (isFirstMessageReceived){
+            Fragment frag = ((MainActivity) getContext()).getForegroundFragment();
+            if(frag != null && frag.toString().startsWith(CanvasOtherPlayer.class.getSimpleName())){
+
+                ((CanvasOtherPlayer)frag).firstDrawMessageReceived();
+            }
+            isFirstMessageReceived = false;
+        }
+
         switch (message.getMotionEventAction()){
 
             case MotionEvent.ACTION_DOWN:{
@@ -121,7 +126,6 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
                 this.path.reset();
                 break;
         }
-
     }
 
     @Override
@@ -170,8 +174,13 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
     public void onWinMessageReceived() {/*EMPTY*/}
 
     @Override
-    public void onHandshakeMessageReceived(InetAddress address) {/*EMPTY*/}
+    public void onTimerExpiredMessage() {/*EMPTY*/}
 
+    @Override
+    public void onEndingMessageReceived() {/*EMPTY*/}
+
+    @Override
+    public void onHandshakeMessageReceived(InetAddress address, String opponentsName) {/*EMPTY*/}
 
     private static class CustomViewSavedState extends BaseSavedState{
 
@@ -200,6 +209,11 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
                 return new CustomViewSavedState[size];
             }
         };
+    }
+
+    public interface canvasViewCallback{
+
+        void firstDrawMessageReceived();
     }
 
 }

@@ -6,10 +6,11 @@ import java.net.InetAddress;
 
 public interface NetworkEventCallback {
 
-    void onHandshakeMessageReceived(InetAddress address);
+    void onHandshakeMessageReceived(InetAddress address, String opponentsName);
     void onDrawMessageReceived(DrawMessage msg);
     void onAnswerMessageReceived(String answer);
     void onWinMessageReceived();
-    //void onTimeOutMessageReceive();
+    void onTimerExpiredMessage();
+    void onEndingMessageReceived();
 }
 

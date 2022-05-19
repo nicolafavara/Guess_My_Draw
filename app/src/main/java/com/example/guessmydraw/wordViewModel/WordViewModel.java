@@ -10,7 +10,6 @@ import java.util.List;
 public class WordViewModel extends AndroidViewModel {
 
     private final WordRepository mRepository;
-
     private final LiveData<List<Word>> mAllWords;
 
     public WordViewModel(Application application) {
