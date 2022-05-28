@@ -14,10 +14,11 @@ import com.example.guessmydraw.fragments.DeviceList;
 
 public class DisconnectionDialog extends DialogFragment {
 
+    public static String TAG = "DisconnectionDialog";
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
         return new AlertDialog.Builder(requireContext())
                 .setMessage(getString(R.string.conferm_disconnection))
                 .setNegativeButton(getString(R.string.cancel), null)
@@ -25,8 +26,8 @@ public class DisconnectionDialog extends DialogFragment {
 
                     FragmentActivity activity = getActivity();
                     if (activity != null){
-                        //TODO CAMBIARE
-                        ((DeviceList.DeviceActionListener) activity).disconnect();
+                        DeviceList.DeviceActionListener listener = (DeviceList.DeviceActionListener) activity;
+                        listener.disconnect();
                     }
                     else {
                         Log.d("DEBUG", "getActivity is null. Disconnection failed.");
@@ -35,6 +36,4 @@ public class DisconnectionDialog extends DialogFragment {
                 } )
                 .create();
     }
-
-    public static String TAG = "PurchaseConfirmationDialog";
 }

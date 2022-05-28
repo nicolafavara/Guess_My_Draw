@@ -30,6 +30,7 @@ import com.example.guessmydraw.utilities.DisconnectionDialog;
 import com.example.guessmydraw.utilities.GameViewModel;
 
 import java.net.InetAddress;
+import java.util.Objects;
 
 public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoListener, NetworkEventCallback {
 
@@ -45,7 +46,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     private GameViewModel gameViewModel;
 
     public Loading() {
-        this.receiver = new Receiver(this);
+        this.receiver = new Receiver(this, null);
         this.receiver.start();
     }
 
@@ -78,6 +79,14 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
         gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
         gameViewModel.init();
         ((Loading.GameCallback) requireActivity()).askForConnectionInfo(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Hide status bar
+        View windowDecorView = requireActivity().getWindow().getDecorView();
+        windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
     @Override
@@ -129,7 +138,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
 
         Log.d("DEBUG", "onHandshakeMessageReceived: " + address.getHostAddress());
         if (groupOwnerFlag){   //if we are the peer we already know the opponent's IP (the groupOwner's)
-            this.gameViewModel.setOpponentAddress(address.getHostAddress());
+            this.gameViewModel.setOpponentAddress(Objects.requireNonNull(address.getHostAddress()));
             this.sender = new Sender(address.getHostAddress());
             this.sender.start();
             sendHandshakeMessage();

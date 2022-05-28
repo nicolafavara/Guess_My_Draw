@@ -7,6 +7,8 @@ import android.os.Message;
 import android.os.Parcelable;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -18,42 +20,40 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Sender extends Thread {
 
+    public static String TAG = "Sender";
+    public static String NET_MSG_ID = "NET_MSG_ID";
+
     public Handler mHandler;
 
-    //TODO SISTEMARE:
-    public static String NET_MSG_ID = "coordinates";
+    protected DatagramSocket senderSocket;
+    protected InetAddress dstAddress;
 
     private final String destName;
-
-    private DatagramSocket senderSocket;
-    private InetAddress dstAddress;
-
     private final Lock handlerLock = new ReentrantLock();
     private final Queue<Bundle> enqueuedMessages = new LinkedList<>();
 
-    public Sender(String destName){
-        assert destName != null;
+    public Sender(@NonNull String destName){
         this.destName = destName;
     }
 
     @Override
-    public void run() {
+    public final void run() {
 
-        Log.d("Sender", "START RUUUUUUUUUUUUUUUUUNNING");
+        Log.d(TAG, "Starting...");
 
         try {
-            this.senderSocket = new DatagramSocket();
-            this.dstAddress = InetAddress.getByName(this.destName);
+            senderSocket = new DatagramSocket();
+            dstAddress = InetAddress.getByName(destName);
         }
         catch (IOException e) {
-            Log.e("ERRORE", e.getMessage());
+            Log.e(TAG, e.getMessage());
         }
 
         Looper.prepare();
 
         mHandler = new Handler(Looper.myLooper()){
             public void handleMessage(Message msg) {
-                Log.d("Sender", "Incoming new message to send...");
+                Log.d(TAG, "Incoming new message to send...");
                 Parcelable msgToSend = (Parcelable) msg.getData().get(NET_MSG_ID);
                 sendPacket(msgToSend);
             }
@@ -63,7 +63,7 @@ public class Sender extends Thread {
             while (!enqueuedMessages.isEmpty()) {
                 Message msg = mHandler.obtainMessage();
                 msg.setData(enqueuedMessages.poll());
-                this.mHandler.sendMessage(msg);
+                mHandler.sendMessage(msg);
             }
         handlerLock.unlock();
 
@@ -75,7 +75,7 @@ public class Sender extends Thread {
             if (mHandler != null) {
                 Message msg = mHandler.obtainMessage();
                 msg.setData(msgData);
-                this.mHandler.sendMessage(msg);
+                mHandler.sendMessage(msg);
             }
             else {
                 enqueuedMessages.add(msgData);
@@ -83,11 +83,11 @@ public class Sender extends Thread {
         handlerLock.unlock();
     }
 
-    private void sendPacket(Parcelable msg){
+    protected void sendPacket(Parcelable msg){
 
         try {
 
-            Log.d("Sender", "sending message to " + dstAddress.getHostAddress() + ".");
+            Log.d(TAG, "sending message to " + dstAddress.getHostAddress() + ".");
             byte[] bytesToSend = ParcelableUtil.marshall(msg);
 
             DatagramPacket packetToSend = new DatagramPacket(   //preparing datagram
@@ -97,10 +97,10 @@ public class Sender extends Thread {
                     Receiver.RECEIVER_PORT
             );
             senderSocket.send(packetToSend);
-            Log.d("Sender", "Datagram sent!");
+            Log.d(TAG, "Datagram sent!");
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
     }
 }

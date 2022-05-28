@@ -16,11 +16,10 @@
         android:textSize="18sp" />
 
     <Button
+        style="@style/button"
         android:id="@+id/button_save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_save"
-        android:layout_margin="@dimen/margin"
-        android:padding="@dimen/padding"/>
+        android:text="@string/button_save"/>
 
 </LinearLayout>

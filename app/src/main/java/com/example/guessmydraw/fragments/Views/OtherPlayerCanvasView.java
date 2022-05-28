@@ -17,9 +17,7 @@ import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.NetworkEventCallback;
-import com.example.guessmydraw.fragments.CanvasCurrentPlayer;
 import com.example.guessmydraw.fragments.CanvasOtherPlayer;
-import com.example.guessmydraw.utilities.GameTimer;
 
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
@@ -28,9 +26,6 @@ import java.net.InetAddress;
 
 
 public class OtherPlayerCanvasView extends View implements NetworkEventCallback {
-
-//    private static final String STATE_PARENT = "parent";
-//    private static final String STATE_BITMAP = "bitmap";
 
     private final Paint paint;
     private final Path path;
@@ -58,7 +53,7 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
         this.paint.setStrokeCap(Paint.Cap.ROUND);
         this.paint.setStrokeWidth(12.0F);
 
-        this.receiver = new Receiver(this);
+        this.receiver = new Receiver(this, null);
         this.receiver.start();
     }
 

@@ -17,7 +17,7 @@ public class GameViewModel extends AndroidViewModel {
     private int scorePlayerOne;
     private int scorePlayerTwo;
     private int roundNumber;
-    private int nPlayerThatWantToEndGame;
+    private int endGameRequests;
 
     public GameViewModel(@NonNull Application application) {
         super(application);
@@ -31,7 +31,7 @@ public class GameViewModel extends AndroidViewModel {
         this.scorePlayerTwo = 0;
         this.roundNumber = 0;
         this.choosenWord = null;
-        this.nPlayerThatWantToEndGame = 0;
+        this.endGameRequests = 0;
     }
 
     public String getPlayersName() {
@@ -84,7 +84,7 @@ public class GameViewModel extends AndroidViewModel {
         this.choosenWord = choosenWord;
     }
 
-    public void setOpponentAddress(String address){
+    public void setOpponentAddress(@NonNull String address){
         this.opponentAddress = address;
     }
 
@@ -108,13 +108,13 @@ public class GameViewModel extends AndroidViewModel {
         return isMyTurnToDraw;
     }
 
-    public int getnPlayerThatWantToEndGame() {
-        return nPlayerThatWantToEndGame;
+    public int getEndGameRequests() {
+        return endGameRequests;
     }
 
     public int askToEndGame() {
-        this.nPlayerThatWantToEndGame++;
-        return nPlayerThatWantToEndGame;
+        this.endGameRequests++;
+        return endGameRequests;
     }
 
     @Override

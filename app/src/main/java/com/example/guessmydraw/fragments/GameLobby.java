@@ -23,7 +23,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.guessmydraw.R;
+import com.example.guessmydraw.connection.AckReceivedCallback;
 import com.example.guessmydraw.connection.Receiver;
+import com.example.guessmydraw.connection.SenderInLoop;
+import com.example.guessmydraw.connection.messages.AckMessage;
 import com.example.guessmydraw.connection.messages.AnswerMessage;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.NetworkEventCallback;
@@ -35,7 +38,7 @@ import com.example.guessmydraw.utilities.GameViewModel;
 import java.net.InetAddress;
 import java.util.Objects;
 
-public class GameLobby extends Fragment implements NetworkEventCallback {
+public class GameLobby extends Fragment implements NetworkEventCallback, AckReceivedCallback {
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private FragmentGameLobbyBinding binding;
@@ -49,14 +52,16 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     private MutableLiveData<String> chosenWord;
 
     private boolean groupOwnerFlag = false;
+    private boolean messageReceivedFromOpponent = false;
     private String opponentAddress;
 
     private Sender sender;
+    private SenderInLoop senderInLoop;
     private Receiver receiver;
     private GameViewModel gameViewModel;
 
     public GameLobby() {
-        this.receiver = new Receiver(this);
+        this.receiver = new Receiver(this, this);
         this.receiver.start();
     }
 
@@ -125,6 +130,9 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     @Override
     public void onResume() {
         super.onResume();
+        // Hide status bar
+        View windowDecorView = requireActivity().getWindow().getDecorView();
+        windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
     @Override
@@ -134,10 +142,17 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
         gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
         groupOwnerFlag = gameViewModel.getGroupOwnerFlag();
         opponentAddress = gameViewModel.getOpponentAddress();
+        //TODO CAPIRE PERCHE' A VOLTE E' NULL
         assert opponentAddress != null;
         Log.d(LOG_STRING_GAME_LOBBY, "STARTING SENDER WITH ADDRESS: " + opponentAddress);
+
+        if(gameViewModel.getMyTurnToDraw()){
+            this.senderInLoop = new SenderInLoop(opponentAddress);
+            this.senderInLoop.start();
+        }
         this.sender = new Sender(opponentAddress);
         this.sender.start();
+
 
         this.chosenWord = Navigation.findNavController(requireActivity(), R.id.my_nav_host_fragment)
                                 .getCurrentBackStackEntry().getSavedStateHandle().getLiveData("chosenWord");
@@ -145,13 +160,14 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
 
             Log.d(LOG_STRING_GAME_LOBBY, "chosenWord changed: " + word + "(" + chosenWord.getValue() + ")");
             sendAnswer(word);
+
             gameViewModel.setChoosenWord(word);
             mainHandler.post(()->{
                 this.roleTextView.setText(R.string.draw);
                 this.wordTextView.setText(word);
                 this.chooseWordButton.setVisibility(View.VISIBLE);
                 this.chooseWordButton.setEnabled(false);
-                this.playButton.setEnabled(true);
+                //this.playButton.setEnabled(true);
             });
         });
 
@@ -211,20 +227,40 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
             messageToSend.setAnswer(answer);
             Bundle bundle = new Bundle();
             bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
-            this.sender.sendMessage(bundle);
+            //sender.sendMessage(bundle);
+
+            senderInLoop.sendMessage(bundle);
         }
         else
             Log.d(LOG_STRING_GAME_LOBBY, "chosen word not sent because null. ");
     }
 
+    private void sendAck(){
+        AckMessage messageToSend = new AckMessage();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
+        sender.sendMessage(bundle);
+    }
+
     @Override
     public void onAnswerMessageReceived(String answer) {
+
+        sendAck();
 
         Log.d(LOG_STRING_GAME_LOBBY, "answer received (" + answer + ").");
         gameViewModel.setChoosenWord(answer);
         mainHandler.post(()->{
             // enable button to choose word only after the current player has obtained
             // the IP of the other player to be able to send him the correct answer
+            this.playButton.setEnabled(true);
+        });
+    }
+
+    @Override
+    public void onAckMessageReceived() {
+
+        senderInLoop.interrupt();
+        mainHandler.post(()-> {
             this.playButton.setEnabled(true);
         });
     }

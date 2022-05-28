@@ -62,9 +62,17 @@ public class DeviceList extends Fragment implements WifiP2pManager.PeerListListe
         this.adapter = new RVAdapter(getContext());
         recyclerView.setAdapter(this.adapter);
 
-        //TODO "riorganizza riga"
-        Objects.requireNonNull(recyclerView.getAdapter()).registerAdapterDataObserver(new EmptyListObserver(recyclerView, view.findViewById(R.id.empty_data_parent)));
+        EmptyListObserver observer = new EmptyListObserver(recyclerView, view.findViewById(R.id.empty_data_parent));
+        Objects.requireNonNull(recyclerView.getAdapter()).registerAdapterDataObserver(observer);
         Log.d("DEBUG", "Adapter created.");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Hide status bar
+        View windowDecorView = requireActivity().getWindow().getDecorView();
+        windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
     @Override

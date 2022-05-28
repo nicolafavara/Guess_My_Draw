@@ -22,7 +22,7 @@
     <string name="yes">Si</string>
     <string name="cancel">Annulla</string>
     <string name="list_empty">In attesa di giocatori nelle vicinanze…</string>
-    <string name="Lobby">Lobby di gioco</string>
+    <string name="Lobby">Lobby</string>
     <string name="guess_my_draw">Guess My Draw!!!</string>
     <string name="p2p_disconnection">L\'avversario ha abbandonato la partita.</string>
     <string name="p2p_already_connected">Sei già connesso con un dispositivo. Disconnettiti prima di procedere.</string>

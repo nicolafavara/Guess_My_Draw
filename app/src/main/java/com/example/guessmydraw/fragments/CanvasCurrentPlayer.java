@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.guessmydraw.R;
+import com.example.guessmydraw.connection.AckReceivedCallback;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.NetworkEventCallback;
 import com.example.guessmydraw.connection.Receiver;
@@ -69,6 +70,9 @@ import java.net.InetAddress;
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentCanvasCurrentPlayerBinding.inflate(inflater, container, false);
+        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
+        String wordToDraw = gameViewModel.getChoosenWord();
+        binding.wordToDraw.setText(wordToDraw);
         return binding.getRoot();
     }
 
@@ -76,7 +80,7 @@ import java.net.InetAddress;
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
+
 
         this.opponentPlayerAddress = gameViewModel.getOpponentAddress();
         Log.d("DEBUG", "CanvasCurrentPlayer: otherPlayerAddress è = " + opponentPlayerAddress);
@@ -84,7 +88,7 @@ import java.net.InetAddress;
         this.sender = new Sender(opponentPlayerAddress);
         this.sender.start();
         
-        this.receiver = new Receiver(this);
+        this.receiver = new Receiver(this, null);
         this.receiver.start();
     }
 

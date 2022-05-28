@@ -14,20 +14,17 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/background_light"
-            tools:layout_editor_absoluteY="81dp">
+            android:background="@android:color/background_light">
 
             <TextView
                 android:id="@+id/device_name"
-                android:layout_width="228dp"
-                android:layout_height="28dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:text=""
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 android:textSize="22sp"
+                android:textStyle="bold"
+                android:text=""
                 app:layout_constraintBottom_toTopOf="@id/device_address"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -35,11 +32,11 @@
 
             <TextView
                 android:id="@+id/device_address"
-                android:layout_width="228dp"
-                android:layout_height="21dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/big_margin"
+                android:layout_marginEnd="@dimen/small_margin"
+                android:layout_marginBottom="@dimen/small_margin"
                 android:text=""
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                 android:textSize="16sp"

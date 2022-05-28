@@ -80,9 +80,9 @@ import com.example.guessmydraw.utilities.GameViewModel;
             if(!answer.equals("")){
 
                 if(this.rightAnswer.equalsIgnoreCase(answer)){
-                    gameViewModel.updateScorePlayerOne();
 
                     timer.cancelTimer();
+                    gameViewModel.updateScorePlayerOne();
                     sendWinMessage();
                     mainHandler.post(()->{
                         Toast.makeText(getContext(), "Hai indovinato!!!", Toast.LENGTH_SHORT).show();
@@ -111,7 +111,15 @@ import com.example.guessmydraw.utilities.GameViewModel;
         this.sender.start();
     }
 
-    @Override
+     @Override
+     public void onResume() {
+         super.onResume();
+         // Hide status bar
+         View windowDecorView = requireActivity().getWindow().getDecorView();
+         windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+     }
+
+     @Override
     public void onDestroyView() {
         super.onDestroyView();
     }
@@ -139,6 +147,7 @@ import com.example.guessmydraw.utilities.GameViewModel;
              Toast.makeText(getContext(), "FINE", Toast.LENGTH_SHORT).show();
          });
 
+         //TODO può dare errore "not associated with a fragment manager" quando ruotiamo lo schermo mentre il timer è attico
          NavHostFragment.findNavController(this).navigate(R.id.end_round);
      }
 
@@ -147,4 +156,11 @@ import com.example.guessmydraw.utilities.GameViewModel;
         Log.d("DEBUG", "starting timer.");
         this.timer.start();
      }
+
+     @Override
+     public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putString("timer", timerTextView.getText().toString());
+        super.onSaveInstanceState(outState);
+     }
+
  }

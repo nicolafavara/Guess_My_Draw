@@ -2,6 +2,7 @@ package com.example.guessmydraw.connection;
 
 import android.util.Log;
 
+import com.example.guessmydraw.connection.messages.AckMessage;
 import com.example.guessmydraw.connection.messages.AnswerMessage;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.messages.EndingMessage;
@@ -14,15 +15,17 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
-public class Receiver extends Thread{
+public class Receiver extends Thread {
 
     public static final int RECEIVER_PORT = 5555;
     private static final int BUFF_SIZE = 4096;
 
     private final NetworkEventCallback callback;
+    private final AckReceivedCallback ackCallback;
 
-    public Receiver(final NetworkEventCallback callback){
+    public Receiver(final NetworkEventCallback callback, final AckReceivedCallback ackCallback){
         this.callback = callback;
+        this.ackCallback = ackCallback;
     }
 
     @Override
@@ -71,6 +74,10 @@ public class Receiver extends Thread{
                 else if (type == EndingMessage.NET_ID) {
                     Log.d("DEBUG-Receiver", "packet EndingMessage received.");
                     callback.onEndingMessageReceived();
+                }
+                else if (type == AckMessage.NET_ID) {
+                    Log.d("DEBUG-Receiver", "packet AckMessage received.");
+                    ackCallback.onAckMessageReceived();
                 }
                 else {
                     throw new RuntimeException("Unknown NET ID!");

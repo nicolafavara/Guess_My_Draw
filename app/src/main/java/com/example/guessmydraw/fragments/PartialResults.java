@@ -44,7 +44,7 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
 
     public PartialResults() {
         // Required empty public constructor
-        this.receiver = new Receiver(this);
+        this.receiver = new Receiver(this, null);
         this.receiver.start();
     }
 
@@ -101,6 +101,14 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
             NavHostFragment.findNavController(this).navigate(R.id.return_to_lobby);
         });
         return binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Hide status bar
+        View windowDecorView = requireActivity().getWindow().getDecorView();
+        windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
     private void sendEndingMessage() {

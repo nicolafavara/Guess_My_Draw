@@ -23,11 +23,10 @@
         app:layout_constraintVertical_bias="0.4" />
 
     <Button
+        style="@style/button"
         android:id="@+id/return_to_first_screen_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin"
-        android:padding="@dimen/padding"
         android:text="@string/return_to_first_screen"
         app:layout_constraintVertical_bias="0.8"
         app:layout_constraintTop_toTopOf="parent"

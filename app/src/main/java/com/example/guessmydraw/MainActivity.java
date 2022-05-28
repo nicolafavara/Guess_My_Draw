@@ -2,6 +2,7 @@ package com.example.guessmydraw;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -12,6 +13,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -23,6 +25,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.example.guessmydraw.databinding.ActivityMainBinding;
@@ -37,6 +40,7 @@ public class MainActivity extends AppCompatActivity
         implements FirstScreen.FirstScreenListener, DeviceList.DeviceActionListener, Loading.GameCallback {
 
     static final String TAG = "DEBUG_MainActivity";
+    private ActivityMainBinding binding;
 
     private final IntentFilter intentFilter = new IntentFilter();
 
@@ -45,9 +49,7 @@ public class MainActivity extends AppCompatActivity
     private boolean isWifiP2pEnabled = false;
     protected boolean isWifiP2pConnected = false;
     private boolean isRefreshing = false;
-
     private BroadcastReceiver receiver = null;
-    private ActivityMainBinding binding;
 
     private GameViewModel gameViewModel;
 
@@ -67,6 +69,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(view);
 
         // Indicates a change in the Wi-Fi P2P status.
@@ -86,6 +89,7 @@ public class MainActivity extends AppCompatActivity
         channel = manager.initialize(this, getMainLooper(), null);
 
         gameViewModel = new ViewModelProvider(this).get(GameViewModel.class);
+
     }
 
     /**
@@ -293,10 +297,16 @@ public class MainActivity extends AppCompatActivity
                 if (dest == null) return;
 
                 String fragmentLabel = Objects.requireNonNull(dest.getLabel()).toString();
+                Log.d(TAG, "FragmentLabel: " + fragmentLabel);
                 if (!fragmentLabel.equals(getResources().getString(R.string.match_results_label))){
                     Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.disconnection);
                 }
+                else{
+                    Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.return_to_first_screen);
+                }
 
+                Log.d(TAG, "Disconnection completed.");
+                isWifiP2pConnected = false;
             }
 
         });
@@ -304,7 +314,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void askForConnectionInfo(WifiP2pManager.ConnectionInfoListener listener) {
-
         manager.requestConnectionInfo(channel, listener);
     }
 
@@ -315,5 +324,12 @@ public class MainActivity extends AppCompatActivity
             return navHostFragment.getChildFragmentManager().getFragments().get(0);
         }
         return null;
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        //outState.putString("message", "This is my message to be reloaded");
+        outState.putBoolean("isWifiP2pConnected", isWifiP2pConnected);
+        super.onSaveInstanceState(outState);
     }
 }
