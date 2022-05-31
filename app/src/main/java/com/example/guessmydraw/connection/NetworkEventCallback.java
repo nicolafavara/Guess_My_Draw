@@ -11,5 +11,6 @@ public interface NetworkEventCallback {
     void onWinMessageReceived();
     void onTimerExpiredMessage();
     void onEndingMessageReceived();
+    void onAckMessageReceived();
 }
 

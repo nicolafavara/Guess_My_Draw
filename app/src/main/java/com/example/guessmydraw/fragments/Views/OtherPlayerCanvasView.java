@@ -18,14 +18,18 @@ import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.NetworkEventCallback;
 import com.example.guessmydraw.fragments.CanvasOtherPlayer;
+import com.example.guessmydraw.utilities.GameViewModel;
 
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.net.InetAddress;
 
 
 public class OtherPlayerCanvasView extends View implements NetworkEventCallback {
+
+    private GameViewModel gameViewModel;
 
     private final Paint paint;
     private final Path path;
@@ -53,8 +57,10 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
         this.paint.setStrokeCap(Paint.Cap.ROUND);
         this.paint.setStrokeWidth(12.0F);
 
-        this.receiver = new Receiver(this, null);
+        this.receiver = new Receiver(this);
         this.receiver.start();
+
+        gameViewModel = new ViewModelProvider(((MainActivity) getContext())).get(GameViewModel.class);
     }
 
     @Override
@@ -84,13 +90,13 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
 
         Log.d("DEBUG", message.toString());
 
-        if (isFirstMessageReceived){
+        if (gameViewModel.getIsFirstMsg()){
             Fragment frag = ((MainActivity) getContext()).getForegroundFragment();
             if(frag != null && frag.toString().startsWith(CanvasOtherPlayer.class.getSimpleName())){
 
                 ((CanvasOtherPlayer)frag).firstDrawMessageReceived();
             }
-            isFirstMessageReceived = false;
+            gameViewModel.setIsFirstMsg(false);
         }
 
         switch (message.getMotionEventAction()){
@@ -173,6 +179,9 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
 
     @Override
     public void onEndingMessageReceived() {/*EMPTY*/}
+
+    @Override
+    public void onAckMessageReceived() {/*EMPTY*/}
 
     @Override
     public void onHandshakeMessageReceived(InetAddress address, String opponentsName) {/*EMPTY*/}

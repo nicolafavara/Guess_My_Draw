@@ -5,11 +5,15 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 public class GameViewModel extends AndroidViewModel {
 
     private boolean groupOwnerFlag;
     private boolean isMyTurnToDraw;
+    private boolean isFirstMsg;
+    private boolean myEndRequest;
     private String playersName;
     private String opponentsName;
     private String opponentAddress;
@@ -32,6 +36,7 @@ public class GameViewModel extends AndroidViewModel {
         this.roundNumber = 0;
         this.choosenWord = null;
         this.endGameRequests = 0;
+        this.isFirstMsg = true;
     }
 
     public String getPlayersName() {
@@ -115,6 +120,22 @@ public class GameViewModel extends AndroidViewModel {
     public int askToEndGame() {
         this.endGameRequests++;
         return endGameRequests;
+    }
+
+    public boolean getIsFirstMsg() {
+        return isFirstMsg;
+    }
+
+    public void setIsFirstMsg(boolean value) {
+        this.isFirstMsg = value;
+    }
+
+    public boolean isMyEndRequest() {
+        return myEndRequest;
+    }
+
+    public void setMyEndRequest(boolean myEndRequest) {
+        this.myEndRequest = myEndRequest;
     }
 
     @Override

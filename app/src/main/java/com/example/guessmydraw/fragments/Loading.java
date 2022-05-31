@@ -46,7 +46,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     private GameViewModel gameViewModel;
 
     public Loading() {
-        this.receiver = new Receiver(this, null);
+        this.receiver = new Receiver(this);
         this.receiver.start();
     }
 
@@ -165,6 +165,9 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
 
     @Override
     public void onEndingMessageReceived() {/*EMPTY*/}
+
+    @Override
+    public void onAckMessageReceived() {/*EMPTY*/}
 
     public interface GameCallback {
         void askForConnectionInfo(WifiP2pManager.ConnectionInfoListener listener);

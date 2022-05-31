@@ -44,6 +44,7 @@ public class DeviceList extends Fragment implements WifiP2pManager.PeerListListe
         binding = FragmentDeviceListBinding.inflate(inflater, container, false);
 
         swipeRefreshLayout = binding.swiperefresh;
+        swipeRefreshLayout.setRefreshing(true);
         swipeRefreshLayout.setOnRefreshListener(this);
 
         return binding.getRoot();
@@ -52,6 +53,8 @@ public class DeviceList extends Fragment implements WifiP2pManager.PeerListListe
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        swipeRefreshLayout.setRefreshing(false);
 
         RecyclerView recyclerView = binding.deviceListRv;
 

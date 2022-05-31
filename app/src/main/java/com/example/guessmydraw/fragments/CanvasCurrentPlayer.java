@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.guessmydraw.R;
-import com.example.guessmydraw.connection.AckReceivedCallback;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.NetworkEventCallback;
 import com.example.guessmydraw.connection.Receiver;
@@ -88,7 +87,7 @@ import java.net.InetAddress;
         this.sender = new Sender(opponentPlayerAddress);
         this.sender.start();
         
-        this.receiver = new Receiver(this, null);
+        this.receiver = new Receiver(this);
         this.receiver.start();
     }
 
@@ -130,6 +129,9 @@ import java.net.InetAddress;
 
      @Override
      public void onEndingMessageReceived() {/*EMPTY*/}
+
+     @Override
+     public void onAckMessageReceived() {/*EMPTY*/}
 
      @Override
      public void onAnswerMessageReceived(String answer) {/*EMPTY*/}

@@ -21,11 +21,9 @@ public class Receiver extends Thread {
     private static final int BUFF_SIZE = 4096;
 
     private final NetworkEventCallback callback;
-    private final AckReceivedCallback ackCallback;
 
-    public Receiver(final NetworkEventCallback callback, final AckReceivedCallback ackCallback){
+    public Receiver(final NetworkEventCallback callback){
         this.callback = callback;
-        this.ackCallback = ackCallback;
     }
 
     @Override
@@ -77,7 +75,7 @@ public class Receiver extends Thread {
                 }
                 else if (type == AckMessage.NET_ID) {
                     Log.d("DEBUG-Receiver", "packet AckMessage received.");
-                    ackCallback.onAckMessageReceived();
+                    callback.onAckMessageReceived();
                 }
                 else {
                     throw new RuntimeException("Unknown NET ID!");

@@ -94,18 +94,6 @@
 
     <Button
         style="@style/button"
-        android:id="@+id/end_match_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/end_match"
-        app:layout_constraintVertical_bias="0.95"
-        app:layout_constraintTop_toBottomOf="@id/text"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/return_to_lobby_button" />
-
-    <Button
-        style="@style/button"
         android:id="@+id/return_to_lobby_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -114,6 +102,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toTopOf="@id/end_match_button"/>
+
+    <Button
+        style="@style/button"
+        android:id="@+id/end_match_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/end_match"
+        app:layout_constraintVertical_bias="0.95"
+        app:layout_constraintTop_toBottomOf="@id/text"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

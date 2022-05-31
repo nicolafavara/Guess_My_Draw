@@ -25,15 +25,14 @@ import com.example.guessmydraw.connection.messages.WinMessage;
 import com.example.guessmydraw.databinding.FragmentCanvasOtherPlayerBinding;
 import com.example.guessmydraw.fragments.Views.OtherPlayerCanvasView;
 import com.example.guessmydraw.utilities.DisconnectionDialog;
-import com.example.guessmydraw.utilities.GameTimer;
 import com.example.guessmydraw.utilities.GameViewModel;
+import com.example.guessmydraw.utilities.TimerModelView;
 
- public class CanvasOtherPlayer extends Fragment implements GameTimer.TimerInterface, OtherPlayerCanvasView.canvasViewCallback{
+ public class CanvasOtherPlayer extends Fragment implements OtherPlayerCanvasView.canvasViewCallback{
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private FragmentCanvasOtherPlayerBinding binding;
 
-    private GameTimer timer;
     private TextView timerTextView;
 
     private String currentPlayerAddress;
@@ -42,6 +41,7 @@ import com.example.guessmydraw.utilities.GameViewModel;
     private Bundle bundle;
 
     private GameViewModel gameViewModel;
+    private TimerModelView timerModelView;
 
     public CanvasOtherPlayer() {
         this.bundle = new Bundle();
@@ -70,9 +70,25 @@ import com.example.guessmydraw.utilities.GameViewModel;
         binding = FragmentCanvasOtherPlayerBinding.inflate(inflater, container, false);
 
         this.timerTextView = binding.timerTextView;
-        this.timer = new GameTimer(this.timerTextView, this);
 
         gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
+        timerModelView = new ViewModelProvider(requireActivity()).get(TimerModelView.class);
+
+        timerModelView.getTimerLiveData().observe(getViewLifecycleOwner(), timeLeft -> {
+
+            int timeLeftInSec = (int) (timeLeft / 1000);
+            timerTextView.setText(String.valueOf(timeLeftInSec));
+
+            if(timeLeftInSec == 0){
+                sendTimerExpiredMessage();
+
+                mainHandler.post(() -> {
+                    Toast.makeText(getContext(), "FINE", Toast.LENGTH_SHORT).show();
+                });
+
+                NavHostFragment.findNavController(this).navigate(R.id.end_round);
+            }
+        });
 
         binding.sendButton.setOnClickListener(view -> {
 
@@ -81,7 +97,7 @@ import com.example.guessmydraw.utilities.GameViewModel;
 
                 if(this.rightAnswer.equalsIgnoreCase(answer)){
 
-                    timer.cancelTimer();
+                    //timer.cancelTimer();
                     gameViewModel.updateScorePlayerOne();
                     sendWinMessage();
                     mainHandler.post(()->{
@@ -139,28 +155,10 @@ import com.example.guessmydraw.utilities.GameViewModel;
     }
 
      @Override
-     public void onTimerExpired() {
-
-         sendTimerExpiredMessage();
-
-         mainHandler.post(() -> {
-             Toast.makeText(getContext(), "FINE", Toast.LENGTH_SHORT).show();
-         });
-
-         //TODO può dare errore "not associated with a fragment manager" quando ruotiamo lo schermo mentre il timer è attico
-         NavHostFragment.findNavController(this).navigate(R.id.end_round);
-     }
-
-     @Override
      public void firstDrawMessageReceived() {
         Log.d("DEBUG", "starting timer.");
-        this.timer.start();
-     }
-
-     @Override
-     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putString("timer", timerTextView.getText().toString());
-        super.onSaveInstanceState(outState);
+        //this.timer.start();
+         timerModelView.requestTimer();
      }
 
  }

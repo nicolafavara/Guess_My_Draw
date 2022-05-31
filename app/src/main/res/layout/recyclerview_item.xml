@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:layout_margin="2dp"
+    android:layout_height="64dp"
+    android:layout_margin="3dp"
     android:background="@color/purple_200">
 
     <TextView
@@ -13,7 +13,6 @@
         style="@style/word_title"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fontFamily="@font/gochi_hand"
         android:gravity="center"
         android:textColor="@color/white"
         android:textSize="34sp"

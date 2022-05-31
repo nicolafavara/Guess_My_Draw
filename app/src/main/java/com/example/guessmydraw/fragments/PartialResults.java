@@ -20,7 +20,6 @@ import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.NetworkEventCallback;
 import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.Sender;
-import com.example.guessmydraw.connection.messages.AnswerMessage;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.messages.EndingMessage;
 import com.example.guessmydraw.databinding.FragmentPartialResultsBinding;
@@ -28,7 +27,6 @@ import com.example.guessmydraw.utilities.DisconnectionDialog;
 import com.example.guessmydraw.utilities.GameViewModel;
 
 import java.net.InetAddress;
-import java.util.Objects;
 
 public class PartialResults extends Fragment implements NetworkEventCallback {
 
@@ -44,7 +42,7 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
 
     public PartialResults() {
         // Required empty public constructor
-        this.receiver = new Receiver(this, null);
+        this.receiver = new Receiver(this);
         this.receiver.start();
     }
 
@@ -87,10 +85,23 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
         scorePlayerTwoTextView.setText(String.valueOf(gameViewModel.getScorePlayerTwo()));
 
         this.endMatchButton = binding.endMatchButton;
+        int n = gameViewModel.getEndGameRequests();
+        if (n != 0){
+            if(gameViewModel.isMyEndRequest()){
+                endMatchButton.setEnabled(false);
+            }
+            String text = requireContext().getString(R.string.end_match) + " (" + n + "/2)";
+            mainHandler.post(() -> {
+                this.endMatchButton.setText(text);
+                if(n == 2){
+                    NavHostFragment.findNavController(this).navigate(R.id.end_match);
+                }
+            });
+        }
         this.endMatchButton.setOnClickListener(view -> {
-
             sendEndingMessage();
-            endMatch();
+            requestEndMatch();
+            gameViewModel.setMyEndRequest(true);
             this.endMatchButton.setEnabled(false);
         });
 
@@ -121,10 +132,10 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
 
     @Override
     public void onEndingMessageReceived() {
-        endMatch();
+        requestEndMatch();
     }
 
-    private void endMatch(){
+    private void requestEndMatch(){
         int n = gameViewModel.askToEndGame();
         String text = requireContext().getString(R.string.end_match) + " (" + n + "/2)";
         mainHandler.post(() -> {
@@ -134,6 +145,9 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
             }
         });
     }
+
+    @Override
+    public void onAckMessageReceived() {/*EMPTY*/}
 
     @Override
     public void onHandshakeMessageReceived(InetAddress address, String opponentsName) {/*EMPTY*/}

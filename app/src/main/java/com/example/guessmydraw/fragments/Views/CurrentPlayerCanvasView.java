@@ -9,15 +9,20 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.widget.Toast;
 
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.fragments.CanvasCurrentPlayer;
+import com.example.guessmydraw.utilities.CanvasViewModel;
 
 public final class CurrentPlayerCanvasView extends View {
+
+    private CanvasViewModel canvasViewModel;
 
     private Canvas extraCanvas;
     private Bitmap extraBitmap;
@@ -39,6 +44,8 @@ public final class CurrentPlayerCanvasView extends View {
         super(context, attrs);
         this.backgroundColor = ResourcesCompat.getColor(this.getResources(), R.color.colorCanvas, null);
         this.touchTolerance = ViewConfiguration.get(context).getScaledTouchSlop();
+
+        this.canvasViewModel = new ViewModelProvider(((MainActivity) getContext())).get(CanvasViewModel.class);
 
         //set the color we will use to paint
         this.paintColor = ResourcesCompat.getColor(this.getResources(), R.color.colorPaint, null);
@@ -65,14 +72,18 @@ public final class CurrentPlayerCanvasView extends View {
             extraBitmap.recycle();
         }
 
+        //Bitmap bitmap = canvasViewModel.getBitmap();
+
         extraBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         extraCanvas = new Canvas(extraBitmap);
         extraCanvas.drawColor(backgroundColor);
     }
 
+
     @Override
     protected void onDraw(Canvas canvas) { //this canvas is not our this.extraCanvas
         super.onDraw(canvas);
+        this.canvasViewModel.setBitmap(extraBitmap);
         canvas.drawBitmap(extraBitmap, 0f, 0f, null);
     }
 

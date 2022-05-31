@@ -23,7 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.guessmydraw.R;
-import com.example.guessmydraw.connection.AckReceivedCallback;
 import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.SenderInLoop;
 import com.example.guessmydraw.connection.messages.AckMessage;
@@ -38,11 +37,11 @@ import com.example.guessmydraw.utilities.GameViewModel;
 import java.net.InetAddress;
 import java.util.Objects;
 
-public class GameLobby extends Fragment implements NetworkEventCallback, AckReceivedCallback {
+public class GameLobby extends Fragment implements NetworkEventCallback {
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private FragmentGameLobbyBinding binding;
     private final String LOG_STRING_GAME_LOBBY = "GAME_LOBBY";
+    private FragmentGameLobbyBinding binding;
 
     private Button playButton;
     private Button chooseWordButton;
@@ -52,7 +51,6 @@ public class GameLobby extends Fragment implements NetworkEventCallback, AckRece
     private MutableLiveData<String> chosenWord;
 
     private boolean groupOwnerFlag = false;
-    private boolean messageReceivedFromOpponent = false;
     private String opponentAddress;
 
     private Sender sender;
@@ -61,7 +59,7 @@ public class GameLobby extends Fragment implements NetworkEventCallback, AckRece
     private GameViewModel gameViewModel;
 
     public GameLobby() {
-        this.receiver = new Receiver(this, this);
+        this.receiver = new Receiver(this);
         this.receiver.start();
     }
 
@@ -150,9 +148,9 @@ public class GameLobby extends Fragment implements NetworkEventCallback, AckRece
             this.senderInLoop = new SenderInLoop(opponentAddress);
             this.senderInLoop.start();
         }
+
         this.sender = new Sender(opponentAddress);
         this.sender.start();
-
 
         this.chosenWord = Navigation.findNavController(requireActivity(), R.id.my_nav_host_fragment)
                                 .getCurrentBackStackEntry().getSavedStateHandle().getLiveData("chosenWord");
@@ -239,7 +237,7 @@ public class GameLobby extends Fragment implements NetworkEventCallback, AckRece
         AckMessage messageToSend = new AckMessage();
         Bundle bundle = new Bundle();
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
-        sender.sendMessage(bundle);
+        this.sender.sendMessage(bundle);
     }
 
     @Override
