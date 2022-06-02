@@ -2,18 +2,14 @@ package com.example.guessmydraw;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDestination;
-import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 
 import android.Manifest;
-import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -26,8 +22,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.guessmydraw.connection.Sender;
+import com.example.guessmydraw.connection.SenderInLoop;
 import com.example.guessmydraw.databinding.ActivityMainBinding;
 import com.example.guessmydraw.fragments.DeviceList;
 import com.example.guessmydraw.fragments.FirstScreen;
@@ -52,6 +51,9 @@ public class MainActivity extends AppCompatActivity
     private BroadcastReceiver receiver = null;
 
     private GameViewModel gameViewModel;
+
+//    private Sender mainSender;
+//    private SenderInLoop mainSenderInLoop;
 
     // Register the permissions callback, which handles the user's response to the
     // system permissions dialog. Save the return value, an instance of
@@ -326,10 +328,26 @@ public class MainActivity extends AppCompatActivity
         return null;
     }
 
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        //outState.putString("message", "This is my message to be reloaded");
-        outState.putBoolean("isWifiP2pConnected", isWifiP2pConnected);
-        super.onSaveInstanceState(outState);
-    }
+//    @Override
+//    protected void onSaveInstanceState(@NonNull Bundle outState) {
+//        //outState.putString("message", "This is my message to be reloaded");
+//        outState.putBoolean("isWifiP2pConnected", isWifiP2pConnected);
+//        super.onSaveInstanceState(outState);
+//    }
+
+//    public void initSenders(String address){
+//        this.mainSender = new Sender(address);
+//        this.mainSender.start();
+//        this.mainSenderInLoop = new SenderInLoop(address);
+//        this.mainSenderInLoop.start();
+//    }
+//
+//    public void sendMessage(Bundle bundle){
+//        this.mainSender.sendMessage(bundle);
+//    }
+//
+//    public void sendMessageInLoop(Bundle bundle){
+//        this.mainSenderInLoop.sendMessage(bundle);
+//    }
+
 }
