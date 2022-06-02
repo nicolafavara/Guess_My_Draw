@@ -3,7 +3,7 @@ package com.example.guessmydraw.connection.messages;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class WinMessage implements Parcelable {
+public class WinMessage implements Parcelable  {
 
     public static byte NET_ID = 3;
 

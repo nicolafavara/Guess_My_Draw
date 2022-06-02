@@ -85,6 +85,11 @@ public class Sender extends Thread {
 
     protected void sendPacket(Parcelable msg){
 
+        if (msg == null){
+            Log.e("DEBUG", "Attempting to send empty message.");
+            return;
+        }
+
         try {
 
             Log.d(TAG, "sending message to " + dstAddress.getHostAddress() + ".");

@@ -18,12 +18,11 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.fragments.CanvasCurrentPlayer;
-import com.example.guessmydraw.utilities.CanvasViewModel;
+import com.example.guessmydraw.utilities.GameViewModel;
 
-public final class CurrentPlayerCanvasView extends View {
+public class CurrentPlayerCanvasView extends View {
 
-    private CanvasViewModel canvasViewModel;
-
+    private GameViewModel gameViewModel;
     private Canvas extraCanvas;
     private Bitmap extraBitmap;
 
@@ -42,49 +41,61 @@ public final class CurrentPlayerCanvasView extends View {
     public CurrentPlayerCanvasView(Context context, AttributeSet attrs) {
 
         super(context, attrs);
-        this.backgroundColor = ResourcesCompat.getColor(this.getResources(), R.color.colorCanvas, null);
-        this.touchTolerance = ViewConfiguration.get(context).getScaledTouchSlop();
+        backgroundColor = ResourcesCompat.getColor(this.getResources(), R.color.colorCanvas, null);
+        touchTolerance = ViewConfiguration.get(context).getScaledTouchSlop();
 
-        this.canvasViewModel = new ViewModelProvider(((MainActivity) getContext())).get(CanvasViewModel.class);
+        gameViewModel = new ViewModelProvider(((MainActivity) getContext())).get(GameViewModel.class);
 
         //set the color we will use to paint
-        this.paintColor = ResourcesCompat.getColor(this.getResources(), R.color.colorPaint, null);
+        paintColor = ResourcesCompat.getColor(this.getResources(), R.color.colorPaint, null);
 
-        this.path = new Path();
+        path = new Path();
 
-        this.paint = new Paint();
-        this.paint.setColor(paintColor);
-        this.paint.setAntiAlias(true);
-        this.paint.setDither(true);
-        this.paint.setStyle(Paint.Style.STROKE);
-        this.paint.setStrokeJoin(Paint.Join.ROUND);
-        this.paint.setStrokeCap(Paint.Cap.ROUND);
-        this.paint.setStrokeWidth(12.0F);
-
+        paint = new Paint();
+        paint.setColor(paintColor);
+        paint.setAntiAlias(true);
+        paint.setDither(true);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeWidth(12.0F);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-
         super.onSizeChanged(w, h, oldw, oldh);
 
         if (extraBitmap != null) {
             extraBitmap.recycle();
         }
 
-        //Bitmap bitmap = canvasViewModel.getBitmap();
+        extraBitmap = Bitmap.createBitmap(w, w, Bitmap.Config.ARGB_8888);
+        // extraBitmap.eraseColor(backgroundColor);
+        extraCanvas = new Canvas();
 
-        extraBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        extraCanvas = new Canvas(extraBitmap);
-        extraCanvas.drawColor(backgroundColor);
+        if (gameViewModel.getBitmap() != null){
+            extraBitmap = gameViewModel.getBitmap();
+            Toast.makeText((MainActivity)getContext(), "Copied", Toast.LENGTH_SHORT).show();
+        }
+
+        extraCanvas.setBitmap(extraBitmap);
     }
-
 
     @Override
     protected void onDraw(Canvas canvas) { //this canvas is not our this.extraCanvas
         super.onDraw(canvas);
-        this.canvasViewModel.setBitmap(extraBitmap);
-        canvas.drawBitmap(extraBitmap, 0f, 0f, null);
+//        canvas.drawBitmap(extraBitmap, 0f, 0f, null);
+        canvas.drawBitmap(extraBitmap, 0f, 0f, paint);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        gameViewModel.setBitmap(extraBitmap);
+    }
+
+    public void changePaintColor(int color){
+        this.paint.setColor(color);
     }
 
     public boolean onTouchEvent(MotionEvent event) {
@@ -140,7 +151,6 @@ public final class CurrentPlayerCanvasView extends View {
         this.path.reset();
     }
 
-
     /*method to send message*/
 
     private void sendTouchStartMessage(float motionTouchEventX, float motionTouchEventY){
@@ -151,7 +161,7 @@ public final class CurrentPlayerCanvasView extends View {
             float xNorm = motionTouchEventX / extraCanvas.getWidth();
             float yNorm = motionTouchEventY / extraCanvas.getHeight();
 
-            ((CanvasCurrentPlayer)frag).sendMessageOverNetwork(xNorm, yNorm, -1, -1, MotionEvent.ACTION_DOWN);
+            ((CanvasCurrentPlayer)frag).sendMessageOverNetwork(xNorm, yNorm, -1, -1, MotionEvent.ACTION_DOWN, paint.getColor());
         }
     }
 
@@ -166,7 +176,7 @@ public final class CurrentPlayerCanvasView extends View {
             float x2Norm = x2 / extraCanvas.getWidth();
             float y2Norm = y2 / extraCanvas.getHeight();
 
-            ((CanvasCurrentPlayer)frag).sendMessageOverNetwork(xNorm, yNorm, x2Norm, y2Norm, MotionEvent.ACTION_MOVE);
+            ((CanvasCurrentPlayer)frag).sendMessageOverNetwork(xNorm, yNorm, x2Norm, y2Norm, MotionEvent.ACTION_MOVE, paint.getColor());
         }
     }
 
@@ -175,7 +185,7 @@ public final class CurrentPlayerCanvasView extends View {
         Fragment frag = ((MainActivity) getContext()).getForegroundFragment();
         if(frag != null && frag.toString().startsWith(CanvasCurrentPlayer.class.getSimpleName())){
 
-            ((CanvasCurrentPlayer)frag).sendMessageOverNetwork(-1, -1, -1, -1, MotionEvent.ACTION_UP);
+            ((CanvasCurrentPlayer)frag).sendMessageOverNetwork(-1, -1, -1, -1, MotionEvent.ACTION_UP, paint.getColor());
         }
     }
 }

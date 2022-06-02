@@ -1,6 +1,7 @@
 package com.example.guessmydraw.utilities;
 
 import android.app.Application;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,7 @@ public class GameViewModel extends AndroidViewModel {
     private int scorePlayerTwo;
     private int roundNumber;
     private int endGameRequests;
+    private Bitmap bitmap;
 
     public GameViewModel(@NonNull Application application) {
         super(application);
@@ -37,6 +39,28 @@ public class GameViewModel extends AndroidViewModel {
         this.choosenWord = null;
         this.endGameRequests = 0;
         this.isFirstMsg = true;
+        this.bitmap = null;
+    }
+
+    public int getRoundNumber() {
+        return roundNumber;
+    }
+
+    public void setNextRound(){
+        Log.d("DEBUG", "NEXT ROUND !!!");
+        this.choosenWord = null;
+        this.roundNumber++;
+        this.isFirstMsg = true;
+        this.bitmap = null;
+    }
+
+    public int askToEndGame() {
+        this.endGameRequests++;
+        return endGameRequests;
+    }
+
+    public int getEndGameRequests() {
+        return endGameRequests;
     }
 
     public String getPlayersName() {
@@ -71,16 +95,6 @@ public class GameViewModel extends AndroidViewModel {
         scorePlayerTwo++;
     }
 
-    public int getRoundNumber() {
-        return roundNumber;
-    }
-
-    public void setNextRound(){
-        Log.d("DEBUG", "NEXT ROUND !!!");
-        this.choosenWord = null;
-        this.roundNumber++;
-    }
-
     public String getChoosenWord() {
         return choosenWord;
     }
@@ -113,15 +127,6 @@ public class GameViewModel extends AndroidViewModel {
         return isMyTurnToDraw;
     }
 
-    public int getEndGameRequests() {
-        return endGameRequests;
-    }
-
-    public int askToEndGame() {
-        this.endGameRequests++;
-        return endGameRequests;
-    }
-
     public boolean getIsFirstMsg() {
         return isFirstMsg;
     }
@@ -136,6 +141,14 @@ public class GameViewModel extends AndroidViewModel {
 
     public void setMyEndRequest(boolean myEndRequest) {
         this.myEndRequest = myEndRequest;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
     }
 
     @Override

@@ -23,12 +23,13 @@ import com.example.guessmydraw.connection.NetworkEventCallback;
 import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.Sender;
 import com.example.guessmydraw.databinding.FragmentCanvasCurrentPlayerBinding;
+import com.example.guessmydraw.fragments.Views.CurrentPlayerCanvasView;
 import com.example.guessmydraw.utilities.DisconnectionDialog;
 import com.example.guessmydraw.utilities.GameViewModel;
 
 import java.net.InetAddress;
 
- public class CanvasCurrentPlayer extends Fragment implements NetworkEventCallback {
+ public class CanvasCurrentPlayer extends Fragment implements NetworkEventCallback, View.OnClickListener {
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private FragmentCanvasCurrentPlayerBinding binding;
@@ -41,6 +42,7 @@ import java.net.InetAddress;
     private Bundle bundle;
 
     private GameViewModel gameViewModel;
+    private CurrentPlayerCanvasView canvasView;
 
     public CanvasCurrentPlayer() {}
 
@@ -59,8 +61,8 @@ import java.net.InetAddress;
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
         // The callback can be enabled or disabled here or in handleOnBackPressed()
 
-        this.bundle = new Bundle();
-        this.messageToSend = new DrawMessage();
+        bundle = new Bundle();
+        messageToSend = new DrawMessage();
 
     }
 
@@ -72,6 +74,19 @@ import java.net.InetAddress;
         gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
         String wordToDraw = gameViewModel.getChoosenWord();
         binding.wordToDraw.setText(wordToDraw);
+        canvasView = binding.currentPlayerCanvasView;
+        binding.buttonColorBlack.setOnClickListener(this);
+        binding.buttonColorWhite.setOnClickListener(this);
+        binding.buttonColorRed.setOnClickListener(this);
+        binding.buttonColorOrange.setOnClickListener(this);
+        binding.buttonColorYellow.setOnClickListener(this);
+        binding.buttonColorGreen.setOnClickListener(this);
+        binding.buttonColorBlue.setOnClickListener(this);
+        binding.buttonColorLightBlue.setOnClickListener(this);
+        binding.buttonColorBrown.setOnClickListener(this);
+        binding.buttonColorGray.setOnClickListener(this);
+        binding.buttonColorPurple.setOnClickListener(this);
+        binding.buttonColorViolet.setOnClickListener(this);
         return binding.getRoot();
     }
 
@@ -79,19 +94,17 @@ import java.net.InetAddress;
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
-
-        this.opponentPlayerAddress = gameViewModel.getOpponentAddress();
+        opponentPlayerAddress = gameViewModel.getOpponentAddress();
         Log.d("DEBUG", "CanvasCurrentPlayer: otherPlayerAddress è = " + opponentPlayerAddress);
-        this.correctAnswer = gameViewModel.getChoosenWord();
-        this.sender = new Sender(opponentPlayerAddress);
-        this.sender.start();
+        correctAnswer = gameViewModel.getChoosenWord();
+        sender = new Sender(opponentPlayerAddress);
+        sender.start();
         
-        this.receiver = new Receiver(this);
-        this.receiver.start();
+        receiver = new Receiver(this);
+        receiver.start();
     }
 
-    public void sendMessageOverNetwork(float currentX, float currentY, float x2, float y2, int motionEventAction) {
+    public void sendMessageOverNetwork(float currentX, float currentY, float x2, float y2, int motionEventAction, int paintColor) {
 
 //        Log.d("DEBUG", "coordinates: currentX = " + currentX + ", currentY = " + currentY
 //                + ", x2 = " + x2 + ", y2 = " + y2 + ", motionEventAction = " + motionEventAction);
@@ -101,11 +114,12 @@ import java.net.InetAddress;
         messageToSend.setX2(x2);
         messageToSend.setY2(y2);
         messageToSend.setMotionEventAction(motionEventAction);
+        messageToSend.setPaintColor(paintColor);
 
         bundle.clear();
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
 
-        this.sender.sendMessage(bundle);
+        sender.sendMessage(bundle);
     }
 
      @Override
@@ -142,4 +156,50 @@ import java.net.InetAddress;
      @Override
      public void onDrawMessageReceived(DrawMessage msg) {/*EMPTY*/}
 
+     @Override
+     public void onClick(View v) {
+
+        int color = -1;
+
+        if (v.getId() == R.id.button_color_black){
+            color = getResources().getColor(R.color.black);
+        }
+        else if (v.getId() == R.id.button_color_white){
+            color = getResources().getColor(R.color.white);
+        }
+        else if (v.getId() == R.id.button_color_red){
+            color = getResources().getColor(R.color.red);
+        }
+        else if (v.getId() == R.id.button_color_orange){
+            color = getResources().getColor(R.color.orange);
+        }
+        else if (v.getId() == R.id.button_color_yellow){
+            color = getResources().getColor(R.color.yellow);
+        }
+        else if (v.getId() == R.id.button_color_green){
+            color = getResources().getColor(R.color.green);
+        }
+        else if (v.getId() == R.id.button_color_blue){
+            color = getResources().getColor(R.color.blue);
+        }
+        else if (v.getId() == R.id.button_color_light_blue){
+            color = getResources().getColor(R.color.light_blue);
+        }
+        else if (v.getId() == R.id.button_color_brown){
+            color = getResources().getColor(R.color.brown);
+        }
+        else if (v.getId() == R.id.button_color_gray){
+            color = getResources().getColor(R.color.gray);
+        }
+        else if (v.getId() == R.id.button_color_purple){
+            color = getResources().getColor(R.color.purple);
+        }
+        else if (v.getId() == R.id.button_color_violet){
+            color = getResources().getColor(R.color.violet);
+        }
+
+
+        Log.d("DEBUG", "COLOR CHANGED.");
+        canvasView.changePaintColor(color);
+     }
  }

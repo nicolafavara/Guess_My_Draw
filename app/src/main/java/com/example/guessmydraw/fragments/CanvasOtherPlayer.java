@@ -73,7 +73,6 @@ import com.example.guessmydraw.utilities.TimerModelView;
 
         gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
         timerModelView = new ViewModelProvider(requireActivity()).get(TimerModelView.class);
-
         timerModelView.getTimerLiveData().observe(getViewLifecycleOwner(), timeLeft -> {
 
             int timeLeftInSec = (int) (timeLeft / 1000);
@@ -97,7 +96,7 @@ import com.example.guessmydraw.utilities.TimerModelView;
 
                 if(this.rightAnswer.equalsIgnoreCase(answer)){
 
-                    //timer.cancelTimer();
+                    timerModelView.cancelTimer();
                     gameViewModel.updateScorePlayerOne();
                     sendWinMessage();
                     mainHandler.post(()->{
@@ -156,7 +155,6 @@ import com.example.guessmydraw.utilities.TimerModelView;
 
      @Override
      public void firstDrawMessageReceived() {
-        Log.d("DEBUG", "starting timer.");
         //this.timer.start();
          timerModelView.requestTimer();
      }

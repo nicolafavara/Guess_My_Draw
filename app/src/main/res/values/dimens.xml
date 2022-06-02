@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="min_height">24dp</dimen>
+    <dimen name="huge_margin">32dp</dimen>
+    <dimen name="huge_padding">32dp</dimen>
     <dimen name="big_margin">16dp</dimen>
     <dimen name="big_padding">16dp</dimen>
     <dimen name="margin">12dp</dimen>

@@ -16,6 +16,8 @@ public class DrawMessage implements Parcelable {
 
     private int motionEventAction = -1;
 
+    private int paintColor;
+
     @NonNull
     @Override
     public String toString() {
@@ -36,18 +38,20 @@ public class DrawMessage implements Parcelable {
                 ", x2 =" + x2 +
                 ", y2 =" + y2 +
                 ", motionEventAction =" + eventAction +
+                ", color = " + paintColor +
                 '}';
     }
 
     public DrawMessage() {
     }
 
-    public DrawMessage(float currentX, float currentY, float x2, float y2, int motionEventAction) {
+    public DrawMessage(float currentX, float currentY, float x2, float y2, int motionEventAction, int paintColor) {
         this.currentX = currentX;
         this.currentY = currentY;
         this.x2 = x2;
         this.y2 = y2;
         this.motionEventAction = motionEventAction;
+        this.paintColor = paintColor;
     }
 
 
@@ -91,6 +95,14 @@ public class DrawMessage implements Parcelable {
         this.motionEventAction = motionEventAction;
     }
 
+    public int getPaintColor() {
+        return paintColor;
+    }
+
+    public void setPaintColor(int paintColor) {
+        this.paintColor = paintColor;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -104,6 +116,7 @@ public class DrawMessage implements Parcelable {
         dest.writeFloat(this.x2);
         dest.writeFloat(this.y2);
         dest.writeInt(this.motionEventAction);
+        dest.writeInt(this.paintColor);
     }
 
     public void readFromParcel(Parcel source) {
@@ -112,6 +125,7 @@ public class DrawMessage implements Parcelable {
         this.x2 = source.readFloat();
         this.y2 = source.readFloat();
         this.motionEventAction = source.readInt();
+        this.paintColor = source.readInt();
     }
 
     protected DrawMessage(Parcel in) {
@@ -121,6 +135,7 @@ public class DrawMessage implements Parcelable {
         this.x2 = in.readFloat();
         this.y2 = in.readFloat();
         this.motionEventAction = in.readInt();
+        this.paintColor = in.readInt();
     }
 
     public static final Creator<DrawMessage> CREATOR = new Creator<DrawMessage>() {

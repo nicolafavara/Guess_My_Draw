@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.NetworkEventCallback;
 import com.example.guessmydraw.connection.Receiver;
@@ -108,6 +109,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
             else if (info.groupFormed) { //we are a peer
 
                 this.gameViewModel.setOpponentAddress(groupOwnerAddress);
+                //((MainActivity) requireActivity()).initSenders(groupOwnerAddress);
                 this.sender = new Sender(groupOwnerAddress);
                 this.sender.start();
                 //sends a packet to the group owner to let him know the IP address of the peer
@@ -131,6 +133,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
         messageToSend.setPlayersName(name);
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
         this.sender.sendMessage(bundle);
+        //((MainActivity) requireActivity()).sendMessage(bundle);
     }
 
     @Override
@@ -139,6 +142,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
         Log.d("DEBUG", "onHandshakeMessageReceived: " + address.getHostAddress());
         if (groupOwnerFlag){   //if we are the peer we already know the opponent's IP (the groupOwner's)
             this.gameViewModel.setOpponentAddress(Objects.requireNonNull(address.getHostAddress()));
+            //((MainActivity) requireActivity()).initSenders(groupOwnerAddress);
             this.sender = new Sender(address.getHostAddress());
             this.sender.start();
             sendHandshakeMessage();

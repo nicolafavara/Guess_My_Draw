@@ -17,4 +17,10 @@
         <item name="android:padding">@dimen/padding</item>
         <item name="android:textSize">18sp</item>
     </style>
+
+    <style name="palette_color_button">
+<!--        <item name="android:layout_marginStart">@dimen/small_margin</item>-->
+<!--        <item name="android:layout_marginEnd">@dimen/small_margin</item>-->
+        <item name="android:layout_margin">4dp</item>
+    </style>
 </resources>

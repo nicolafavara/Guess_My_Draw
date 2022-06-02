@@ -6,7 +6,7 @@
     tools:context=".fragments.CanvasCurrentPlayer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/purple_700"
+    android:background="@color/primaryDarkColor"
     android:id="@+id/current_player_view">
 
     <TextView
@@ -14,13 +14,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_margin="@dimen/margin"
+        android:layout_margin="@dimen/big_margin"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="24sp"
         android:textStyle="bold"
         tools:text="Parola"
-        app:layout_constraintBottom_toTopOf="@+id/current_player_canvas_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -28,9 +27,132 @@
         android:id="@+id/current_player_canvas_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="@color/colorCanvas"
+        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/word_to_draw" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/current_player_canvas_view"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:columnCount="4"
+        android:rowCount="3">
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/palette_color_button"
+            android:id="@+id/button_color_black"
+            android:background="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="0"
+            android:layout_column="0" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/palette_color_button"
+            android:id="@+id/button_color_white"
+            android:background="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="0"
+            android:layout_column="1" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/palette_color_button"
+            android:id="@+id/button_color_red"
+            android:background="@color/red"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="0"
+            android:layout_column="2" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/palette_color_button"
+            android:id="@+id/button_color_orange"
+            android:background="@color/orange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="0"
+            android:layout_column="3" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/palette_color_button"
+            android:id="@+id/button_color_yellow"
+            android:background="@color/yellow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="1"
+            android:layout_column="0" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/palette_color_button"
+            android:id="@+id/button_color_green"
+            android:background="@color/green"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="1"
+            android:layout_column="1" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/palette_color_button"
+            android:id="@+id/button_color_blue"
+            android:background="@color/blue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="1"
+            android:layout_column="2" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/palette_color_button"
+            android:id="@+id/button_color_light_blue"
+            android:background="@color/light_blue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="1"
+            android:layout_column="3" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/palette_color_button"
+            android:id="@+id/button_color_brown"
+            android:background="@color/brown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="2"
+            android:layout_column="0" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/palette_color_button"
+            android:id="@+id/button_color_gray"
+            android:background="@color/gray"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="2"
+            android:layout_column="1" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/palette_color_button"
+            android:id="@+id/button_color_purple"
+            android:background="@color/purple"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="2"
+            android:layout_column="2" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/palette_color_button"
+            android:id="@+id/button_color_violet"
+            android:background="@color/violet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="2"
+            android:layout_column="3" />
+    </GridLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
