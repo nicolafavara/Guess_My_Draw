@@ -36,14 +36,11 @@ import java.util.Objects;
 public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoListener, NetworkEventCallback {
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final static String TAG = "LOADING_FRAGMENT";
     private FragmentLoadingBinding binding;
-    private String groupOwnerAddress;
+    private MainActivity activity;
+
     private boolean groupOwnerFlag = false;
-
-    private Sender sender;
-    private Receiver receiver;
-
-    private TextView addressTextView;
     private GameViewModel gameViewModel;
 
     public Loading() {}
@@ -52,7 +49,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        MainActivity activity = (MainActivity) requireActivity();
+        activity = (MainActivity) requireActivity();
 
         //register for callback to the activity receiver
         activity.registerForReceiver(this);
@@ -72,7 +69,6 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentLoadingBinding.inflate(inflater, container, false);
-        this.addressTextView = binding.address;
         return binding.getRoot();
     }
 
@@ -81,14 +77,15 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
         super.onViewCreated(view, savedInstanceState);
         gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
         gameViewModel.init();
-        ((Loading.GameCallback) requireActivity()).askForConnectionInfo(this);
+        activity.askForConnectionInfo(this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        activity = (MainActivity) requireActivity();
         // Hide status bar
-        View windowDecorView = requireActivity().getWindow().getDecorView();
+        View windowDecorView = activity.getWindow().getDecorView();
         windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
@@ -97,28 +94,26 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
 
         if (info.groupOwnerAddress != null) {
 
-            Log.d("DEBUG", "indirizzo Owner del gruppo: " + info.groupOwnerAddress.getHostAddress());
+            Log.d(TAG, "indirizzo Owner del gruppo: " + info.groupOwnerAddress.getHostAddress());
             // String from WifiP2pInfo struct
-            this.groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
+            String groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
 
-            Log.d("DEBUG", "info.groupFormed: " + info.groupFormed + "info.isGroupOwner: " + info.isGroupOwner);
+            Log.d(TAG, "info.groupFormed: " + info.groupFormed + "info.isGroupOwner: " + info.isGroupOwner);
             if (info.groupFormed && info.isGroupOwner) { //we are the group owner
 
                 this.groupOwnerFlag = true;
-                Log.d("DEBUG", "I'm the group owner.");
+                Log.d(TAG, "I'm the group owner.");
                 this.gameViewModel.setGroupOwnerFlag(true);
             }
             else if (info.groupFormed) { //we are a peer
 
                 this.gameViewModel.setOpponentAddress(groupOwnerAddress);
-                //((MainActivity) requireActivity()).initSenders(groupOwnerAddress);
-                this.sender = new Sender(groupOwnerAddress);
-                this.sender.start();
+                activity.initSenders(groupOwnerAddress);
                 //sends a packet to the group owner to let him know the IP address of the peer
-                sendHandshakeMessage();
+                sendHandshakeMessage(true);
             }
             else{
-                Log.d("DEBUG", "nooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+                Log.d(TAG, "nooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
             }
         }
     }
@@ -126,32 +121,41 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     /**
      * used by Peer to send address to the GroupOwner
      */
-    private void sendHandshakeMessage() {
+    private void sendHandshakeMessage(boolean inLoop) {
 
-        Log.d("DEBUG", "sending address to other player.");
+        Log.d(TAG, "sending address to other player.");
         HandshakeMessage messageToSend = new HandshakeMessage();
         Bundle bundle = new Bundle();
         String name = gameViewModel.getPlayersName();
         messageToSend.setPlayersName(name);
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
-        this.sender.sendMessage(bundle);
-        //((MainActivity) requireActivity()).sendMessage(bundle);
+        if (inLoop){
+            activity.sendMessageInLoop(bundle);
+        }
+        else{
+            activity.sendMessage(bundle);
+        }
     }
 
     @Override
     public void onHandshakeMessageReceived(InetAddress address, String opponentsName) {
 
-        Log.d("DEBUG", "onHandshakeMessageReceived: " + address.getHostAddress());
-        if (groupOwnerFlag){   //if we are the peer we already know the opponent's IP (the groupOwner's)
+
+        Log.d(TAG, "onHandshakeMessageReceived: " + address.getHostAddress());
+        if (groupOwnerFlag){
+            //we are the group owner, so we use the message received to save the peer's address
             this.gameViewModel.setOpponentAddress(Objects.requireNonNull(address.getHostAddress()));
-            //((MainActivity) requireActivity()).initSenders(groupOwnerAddress);
-            this.sender = new Sender(address.getHostAddress());
-            this.sender.start();
-            sendHandshakeMessage();
+            activity.initSenders(address.getHostAddress());
+            sendHandshakeMessage(false);
         }
+        else{
+            //peer has received the handshake message, it can stop sender
+            activity.stopSenderInLoop();
+        }
+
         this.gameViewModel.setOpponentsName(opponentsName);
         mainHandler.post(() -> {
-                Log.d("DEBUG", "STARTING LOBBY");
+                Log.d(TAG, "STARTING LOBBY");
                 NavHostFragment.findNavController(this).navigate(R.id.start_lobby);
             }
         );

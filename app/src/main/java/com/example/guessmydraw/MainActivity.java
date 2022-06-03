@@ -34,6 +34,7 @@ import com.example.guessmydraw.databinding.ActivityMainBinding;
 import com.example.guessmydraw.fragments.DeviceList;
 import com.example.guessmydraw.fragments.FirstScreen;
 import com.example.guessmydraw.fragments.Loading;
+import com.example.guessmydraw.utilities.ActivityViewModel;
 import com.example.guessmydraw.utilities.GameViewModel;
 
 import java.net.InetAddress;
@@ -55,10 +56,11 @@ public class MainActivity extends AppCompatActivity
     private BroadcastReceiver broadcastReceiver = null;
 
     private GameViewModel gameViewModel;
+    //private ActivityViewModel activityViewModel;
 
     private Receiver receiver;
-//    private Sender mainSender;
-//    private SenderInLoop mainSenderInLoop;
+    private Sender mainSender;
+    private SenderInLoop mainSenderInLoop;
 
     // Register the permissions callback, which handles the user's response to the
     // system permissions dialog. Save the return value, an instance of
@@ -96,8 +98,8 @@ public class MainActivity extends AppCompatActivity
         channel = manager.initialize(this, getMainLooper(), null);
 
         gameViewModel = new ViewModelProvider(this).get(GameViewModel.class);
-        receiver = new Receiver();
-        receiver.start();
+        //activityViewModel = new ViewModelProvider(this).get(ActivityViewModel.class);
+
     }
 
     /**
@@ -121,6 +123,7 @@ public class MainActivity extends AppCompatActivity
             return false;
         }
 
+        //TODO SE LO XIAOMI HA IL WI_FI SPENTO L'APP CRASHA
         if (!wifiManager.isP2pSupported()) {
             Log.e(TAG, "Wi-Fi Direct is not supported by the hardware or Wi-Fi is off.");
             return false;
@@ -170,6 +173,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void registerForReceiver(@NonNull NetworkEventCallback callback){
+        if (receiver == null){
+            receiver = new Receiver();
+            receiver.start();
+            Log.e(TAG, "RECEIVER IS NULL !!!");
+        }
         receiver.setNetworkEventCallback(callback);
     }
 
@@ -238,7 +246,6 @@ public class MainActivity extends AppCompatActivity
 
         isRefreshing = true;
         //to refresh the device search, we call again the method to request again the discovery phase
-        //TODO trovare un modo per non eliminare sempre il fragment per poi ricrearlo
         startDiscovery();
     }
 
@@ -311,26 +318,26 @@ public class MainActivity extends AppCompatActivity
         return null;
     }
 
-//    @Override
-//    protected void onSaveInstanceState(@NonNull Bundle outState) {
-//        //outState.putString("message", "This is my message to be reloaded");
-//        outState.putBoolean("isWifiP2pConnected", isWifiP2pConnected);
-//        super.onSaveInstanceState(outState);
-//    }
+    public void initSenders(String address){
+        Log.d(TAG, "INIT_SENDERS");
+        this.mainSender = new Sender(address);
+        this.mainSender.start();
+        this.mainSenderInLoop = new SenderInLoop(address);
+        this.mainSenderInLoop.start();
+    }
 
-//    public void initSenders(String address){
-//        this.mainSender = new Sender(address);
-//        this.mainSender.start();
-//        this.mainSenderInLoop = new SenderInLoop(address);
-//        this.mainSenderInLoop.start();
-//    }
-//
-//    public void sendMessage(Bundle bundle){
-//        this.mainSender.sendMessage(bundle);
-//    }
-//
-//    public void sendMessageInLoop(Bundle bundle){
-//        this.mainSenderInLoop.sendMessage(bundle);
-//    }
+    public void sendMessage(Bundle bundle){
+        Log.d(TAG, "sendMessage");
+        this.mainSender.sendMessage(bundle);
+    }
+
+    public void sendMessageInLoop(Bundle bundle){
+        Log.d(TAG, "sendMessageInLoop");
+        this.mainSenderInLoop.sendMessage(bundle);
+    }
+
+    public void stopSenderInLoop(){
+        this.mainSenderInLoop.stopLoop();
+    }
 
 }

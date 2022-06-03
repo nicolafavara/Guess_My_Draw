@@ -25,9 +25,7 @@ public class FirstScreen extends Fragment {
     private FragmentFirstScreenBinding binding;
     private EditText playersNameEditText;
 
-    public FirstScreen() {
-        // Required empty public constructor
-    }
+    public FirstScreen() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,7 +75,6 @@ public class FirstScreen extends Fragment {
     }
 
     public interface FirstScreenListener {
-
         void startDiscovery();
     }
 }

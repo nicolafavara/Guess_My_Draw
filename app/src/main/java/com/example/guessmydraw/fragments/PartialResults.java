@@ -19,7 +19,6 @@ import android.widget.TextView;
 import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.NetworkEventCallback;
-import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.Sender;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.messages.EndingMessage;
@@ -32,13 +31,12 @@ import java.net.InetAddress;
 public class PartialResults extends Fragment implements NetworkEventCallback {
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final static String TAG = "PARTIAL_RESULTS";
     private FragmentPartialResultsBinding binding;
-    private String LOG_STRING_PARTIAL_RESULTS = "PARTIAL_RESULTS";
+    private MainActivity activity;
+
     private GameViewModel gameViewModel;
-
     private Button endMatchButton;
-
-    private Sender sender;
 
     public PartialResults() {}
 
@@ -46,7 +44,7 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        MainActivity activity = (MainActivity) requireActivity();
+        activity = (MainActivity) requireActivity();
 
         //register for callback to the activity receiver
         activity.registerForReceiver(this);
@@ -73,15 +71,11 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
 
         gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
 
-        String opponentAddress = gameViewModel.getOpponentAddress();
-        this.sender = new Sender(opponentAddress);
-        this.sender.start();
-
         p1Name.setText(gameViewModel.getPlayersName());
         p2Name.setText(gameViewModel.getOpponentsName());
 
-        Log.d(LOG_STRING_PARTIAL_RESULTS, "score 1: " + gameViewModel.getScorePlayerOne());
-        Log.d(LOG_STRING_PARTIAL_RESULTS, "score 2: " + gameViewModel.getScorePlayerTwo());
+        Log.d(TAG, "score 1: " + gameViewModel.getScorePlayerOne());
+        Log.d(TAG, "score 2: " + gameViewModel.getScorePlayerTwo());
         scorePlayerOneTextView.setText(String.valueOf(gameViewModel.getScorePlayerOne()));
         scorePlayerTwoTextView.setText(String.valueOf(gameViewModel.getScorePlayerTwo()));
 
@@ -118,22 +112,18 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
     @Override
     public void onResume() {
         super.onResume();
+        activity = (MainActivity) requireActivity();
         // Hide status bar
-        View windowDecorView = requireActivity().getWindow().getDecorView();
+        View windowDecorView = activity.getWindow().getDecorView();
         windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
     private void sendEndingMessage() {
-        Log.d(LOG_STRING_PARTIAL_RESULTS, "sending end message to opponent.");
+        Log.d(TAG, "sending end message to opponent.");
         EndingMessage messageToSend = new EndingMessage();
         Bundle bundle = new Bundle();
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
-        this.sender.sendMessage(bundle);
-    }
-
-    @Override
-    public void onEndingMessageReceived() {
-        requestEndMatch();
+        activity.sendMessage(bundle);
     }
 
     private void requestEndMatch(){
@@ -145,6 +135,11 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
                 NavHostFragment.findNavController(this).navigate(R.id.end_match);
             }
         });
+    }
+
+    @Override
+    public void onEndingMessageReceived() {
+        requestEndMatch();
     }
 
     @Override

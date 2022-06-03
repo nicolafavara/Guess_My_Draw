@@ -23,9 +23,7 @@ public class MatchResults extends Fragment {
 
     private FragmentMatchResultsBinding binding;
 
-    public MatchResults() {
-        // Required empty public constructor
-    }
+    public MatchResults() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

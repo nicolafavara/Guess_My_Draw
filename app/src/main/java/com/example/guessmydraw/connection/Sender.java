@@ -20,8 +20,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Sender extends Thread {
 
-    public static String TAG = "Sender";
-    public static String NET_MSG_ID = "NET_MSG_ID";
+    public final static String TAG = "SENDER";
+    public final static String NET_MSG_ID = "NET_MSG_ID";
 
     public Handler mHandler;
 

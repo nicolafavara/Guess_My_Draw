@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.Sender;
 import com.example.guessmydraw.connection.messages.TimerExpiredMessage;
@@ -32,12 +33,10 @@ import com.example.guessmydraw.utilities.TimerModelView;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private FragmentCanvasOtherPlayerBinding binding;
+    private MainActivity activity;
 
     private TextView timerTextView;
-
-    private String currentPlayerAddress;
     private String rightAnswer;
-    private Sender sender;
     private Bundle bundle;
 
     private GameViewModel gameViewModel;
@@ -52,6 +51,8 @@ import com.example.guessmydraw.utilities.TimerModelView;
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        activity = (MainActivity) requireActivity();
+
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -59,7 +60,7 @@ import com.example.guessmydraw.utilities.TimerModelView;
                 new DisconnectionDialog().show(getChildFragmentManager(), DisconnectionDialog.TAG);
             }
         };
-        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+        activity.getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override
@@ -117,19 +118,15 @@ import com.example.guessmydraw.utilities.TimerModelView;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        this.currentPlayerAddress = gameViewModel.getOpponentAddress();
         this.rightAnswer = gameViewModel.getChoosenWord();
-        Log.d("DEBUG", "CanvasOtherPlayer: l'IP del giocatore corrente è: " + currentPlayerAddress);
-        this.sender = new Sender(currentPlayerAddress);
-        this.sender.start();
     }
 
      @Override
      public void onResume() {
          super.onResume();
+         activity = (MainActivity) requireActivity();
          // Hide status bar
-         View windowDecorView = requireActivity().getWindow().getDecorView();
+         View windowDecorView = activity.getWindow().getDecorView();
          windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
      }
 
@@ -142,19 +139,18 @@ import com.example.guessmydraw.utilities.TimerModelView;
         WinMessage messageToSend = new WinMessage();
         bundle.clear();
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
-        this.sender.sendMessage(bundle);
+        activity.sendMessage(bundle);
     }
 
     private void sendTimerExpiredMessage(){
         TimerExpiredMessage messageToSend = new TimerExpiredMessage();
         bundle.clear();
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
-        this.sender.sendMessage(bundle);
+        activity.sendMessage(bundle);
     }
 
      @Override
      public void firstDrawMessageReceived() {
-        //this.timer.start();
          timerModelView.requestTimer();
      }
 

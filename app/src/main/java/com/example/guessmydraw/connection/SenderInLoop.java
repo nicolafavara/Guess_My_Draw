@@ -10,7 +10,8 @@ import java.net.DatagramPacket;
 
 public class SenderInLoop extends Sender {
 
-    public static String TAG = "SenderInLoop";
+    public final static String TAG = "SenderInLoop";
+    public boolean stopLoop;
 
     public SenderInLoop(@NonNull String destName) {
         super(destName);
@@ -31,13 +32,14 @@ public class SenderInLoop extends Sender {
                     Receiver.RECEIVER_PORT
             );
 
-            while (!this.isInterrupted()){
+            while (!stopLoop){
 
                 senderSocket.send(packetToSend);
                 Log.d(TAG, "Datagram sent!");
 
                 Thread.sleep(500);
             }
+            stopLoop = false;
 
         }
         catch (IOException e) {
@@ -46,6 +48,10 @@ public class SenderInLoop extends Sender {
         catch (InterruptedException e) {
             Log.d(TAG, "thread interrupted.");
         }
+    }
+
+    public void stopLoop(){
+        stopLoop = true;
     }
 
 }

@@ -23,6 +23,7 @@ import com.example.guessmydraw.fragments.Loading;
 
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
+    private final static String TAG = "BR_RECEIVER";
     private final WifiP2pManager manager;
     private final WifiP2pManager.Channel channel;
     private final MainActivity activity;
@@ -49,11 +50,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
             if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
                 activity.setIsWifiP2pEnabled(true);
+                Log.d(TAG, "P2P state enabled.");
             } else {
                 activity.setIsWifiP2pEnabled(false);
                 activity.resetData();
+                Log.d(TAG, "P2P state changed not enabled.");
             }
-            Log.d(MainActivity.TAG, "P2P state changed - " + state);
         }
         else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             // A change in the list of available peers occurred.
@@ -64,43 +66,52 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 activity.requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
             }
 
+            Log.d(TAG, "Intent WIFI_P2P_PEERS_CHANGED_ACTION received.");
+
             Fragment frag = activity.getForegroundFragment();
 
             //TODO TROVARE UN MODO PIU' "PULITO" PER FARLO
             if(frag != null && frag.toString().startsWith(deviceListClassName)){
 
-                Log.d(MainActivity.TAG, "requesting peers...");
+                Log.d(TAG, "requesting peers...");
                 WifiP2pManager.PeerListListener listener = (WifiP2pManager.PeerListListener) frag;
                 manager.requestPeers(channel, listener);
+            }
+            else{
+                Log.d(TAG, "Requesting peers failed because the current fragment is not deviceList.");
             }
 
         }
         else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
 
+            Log.d(TAG, "Intent WIFI_P2P_CONNECTION_CHANGED_ACTION received.");
             if (manager == null) return;
 
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 
             if (networkInfo.isConnected()) {
-
+                Log.d(TAG, "Network Info: Connected.");
                 activity.isWifiP2pConnected = true;
 
                 Fragment frag = activity.getForegroundFragment();
                 if(frag != null && frag.toString().startsWith(Loading.class.getSimpleName())){
-                    Log.d(MainActivity.TAG, "requesting connection info...");
+                    Log.d(TAG, "Current fragment is Loading: requesting connection info...");
                     WifiP2pManager.ConnectionInfoListener listener = (WifiP2pManager.ConnectionInfoListener) frag;
                     manager.requestConnectionInfo(channel, listener);
                 }
                 else if(frag != null && frag.toString().startsWith(deviceListClassName)){
+                    Log.d(TAG, "Current fragment is device list: starting loading page...");
                     Navigation.findNavController(activity, R.id.my_nav_host_fragment).navigate(R.id.start_loading_page);
+                }
+                else{
+                    Log.d(TAG, "Current fragment is not what you aspected to be.");
                 }
 
             }
             else{
 
+                Log.d(TAG, "Network Info: Not Connected.");
                 activity.isWifiP2pConnected = false;
-
-                Log.d(MainActivity.TAG, "---> networkInfo.isConnected() in false");
 
                 Fragment frag = activity.getForegroundFragment();
 
@@ -108,10 +119,11 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 if(frag != null && !frag.toString().startsWith(firstFragmentClassName)
                         && !frag.toString().startsWith(deviceListClassName)){
 
+                    Log.d(TAG, "Connection interrupted...returning to device list fragment. ");
+
                     Toast.makeText(activity, R.string.p2p_disconnection, Toast.LENGTH_LONG).show();
                     Navigation.findNavController(activity, R.id.my_nav_host_fragment).navigate(R.id.disconnection);
                 }
-
             }
         }
         //else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {}
