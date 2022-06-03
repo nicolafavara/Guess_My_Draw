@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.NetworkEventCallback;
@@ -38,7 +39,6 @@ import java.net.InetAddress;
 
     private DrawMessage messageToSend;
     private Sender sender;
-    private Receiver receiver;  //receiver for the answer sent from other player
     private Bundle bundle;
 
     private GameViewModel gameViewModel;
@@ -50,6 +50,11 @@ import java.net.InetAddress;
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        MainActivity activity = (MainActivity) requireActivity();
+
+        //register for callback to the activity receiver
+        activity.registerForReceiver(this);
+
         // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
@@ -58,12 +63,11 @@ import java.net.InetAddress;
                 new DisconnectionDialog().show(getChildFragmentManager(), DisconnectionDialog.TAG);
             }
         };
-        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+        activity.getOnBackPressedDispatcher().addCallback(this, callback);
         // The callback can be enabled or disabled here or in handleOnBackPressed()
 
         bundle = new Bundle();
         messageToSend = new DrawMessage();
-
     }
 
     @Override
@@ -99,9 +103,9 @@ import java.net.InetAddress;
         correctAnswer = gameViewModel.getChoosenWord();
         sender = new Sender(opponentPlayerAddress);
         sender.start();
-        
-        receiver = new Receiver(this);
-        receiver.start();
+//
+//        receiver = new Receiver(this);
+//        receiver.start();
     }
 
     public void sendMessageOverNetwork(float currentX, float currentY, float x2, float y2, int motionEventAction, int paintColor) {

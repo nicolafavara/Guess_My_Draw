@@ -2,6 +2,7 @@ package com.example.guessmydraw;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -22,17 +23,20 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.guessmydraw.connection.NetworkEventCallback;
+import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.Sender;
 import com.example.guessmydraw.connection.SenderInLoop;
+import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.databinding.ActivityMainBinding;
 import com.example.guessmydraw.fragments.DeviceList;
 import com.example.guessmydraw.fragments.FirstScreen;
 import com.example.guessmydraw.fragments.Loading;
 import com.example.guessmydraw.utilities.GameViewModel;
 
+import java.net.InetAddress;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
@@ -48,10 +52,11 @@ public class MainActivity extends AppCompatActivity
     private boolean isWifiP2pEnabled = false;
     protected boolean isWifiP2pConnected = false;
     private boolean isRefreshing = false;
-    private BroadcastReceiver receiver = null;
+    private BroadcastReceiver broadcastReceiver = null;
 
     private GameViewModel gameViewModel;
 
+    private Receiver receiver;
 //    private Sender mainSender;
 //    private SenderInLoop mainSenderInLoop;
 
@@ -91,7 +96,8 @@ public class MainActivity extends AppCompatActivity
         channel = manager.initialize(this, getMainLooper(), null);
 
         gameViewModel = new ViewModelProvider(this).get(GameViewModel.class);
-
+        receiver = new Receiver();
+        receiver.start();
     }
 
     /**
@@ -141,14 +147,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
-        receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
-        registerReceiver(receiver, intentFilter);
+        broadcastReceiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
+        registerReceiver(broadcastReceiver, intentFilter);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        unregisterReceiver(receiver);
+        unregisterReceiver(broadcastReceiver);
     }
 
     /**
@@ -163,23 +169,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
-//    /**
-//     * Callback from FirstScreen Fragment
-//     */
-//    @Override
-//    public void enableWiFiDirect() {
-//        if (manager != null && channel != null) {
-//
-//            // Since this is the system wireless settings activity, it's
-//            // not going to send us a result. We will be notified by
-//            // WiFiDeviceBroadcastReceiver instead.
-//
-//            startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
-//        } else {
-//            Log.e(TAG, "channel or manager is null");
-//        }
-//    }
+    public void registerForReceiver(@NonNull NetworkEventCallback callback){
+        receiver.setNetworkEventCallback(callback);
+    }
 
     private boolean checkBeforeDiscovery(){
 
@@ -224,15 +216,6 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess() {
-//                VECCHIO CODICE
-//                NavOptions navOptions = null;
-//                if(isRefreshing){
-//                    navOptions = new NavOptions.Builder().setPopUpTo(R.id.device_list, true).build();
-//                    isRefreshing = false;
-//                }
-//                Log.d("DEBUG", "show device list...");
-//                Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.show_device_list,null, navOptions);
-
                 NavDestination dest = Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).getCurrentDestination();
                 if (dest == null) return;
 

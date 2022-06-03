@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.SenderInLoop;
@@ -55,17 +56,18 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
 
     private Sender sender;
     private SenderInLoop senderInLoop;
-    private Receiver receiver;
     private GameViewModel gameViewModel;
 
-    public GameLobby() {
-        this.receiver = new Receiver(this);
-        this.receiver.start();
-    }
+    public GameLobby() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        MainActivity activity = (MainActivity) requireActivity();
+
+        //register for callback to the activity receiver
+        activity.registerForReceiver(this);
 
         // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -75,7 +77,7 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
                 new DisconnectionDialog().show(getChildFragmentManager(), DisconnectionDialog.TAG);
             }
         };
-        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+        activity.getOnBackPressedDispatcher().addCallback(this, callback);
         // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 

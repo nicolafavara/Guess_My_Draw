@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.NetworkEventCallback;
 import com.example.guessmydraw.connection.Receiver;
@@ -38,17 +39,17 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
     private Button endMatchButton;
 
     private Sender sender;
-    private Receiver receiver;
 
-    public PartialResults() {
-        // Required empty public constructor
-        this.receiver = new Receiver(this);
-        this.receiver.start();
-    }
+    public PartialResults() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        MainActivity activity = (MainActivity) requireActivity();
+
+        //register for callback to the activity receiver
+        activity.registerForReceiver(this);
 
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
@@ -57,7 +58,7 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
                 new DisconnectionDialog().show(getChildFragmentManager(), DisconnectionDialog.TAG);
             }
         };
-        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+        activity.getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override

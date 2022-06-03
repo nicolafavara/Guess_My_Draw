@@ -36,10 +36,6 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
     private Bitmap extraBitmap;
     private final int backgroundColor;
 
-    private final Receiver receiver;
-
-    private boolean isFirstMessageReceived = true;
-
     public OtherPlayerCanvasView(Context context, AttributeSet attrs){
 
         super(context, attrs);
@@ -56,10 +52,10 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
         this.paint.setStrokeCap(Paint.Cap.ROUND);
         this.paint.setStrokeWidth(12.0F);
 
-        this.receiver = new Receiver(this);
-        this.receiver.start();
-
-        gameViewModel = new ViewModelProvider(((MainActivity) getContext())).get(GameViewModel.class);
+        MainActivity activity = (MainActivity) getContext();
+        //register for callback to the activity receiver
+        activity.registerForReceiver(this);
+        gameViewModel = new ViewModelProvider(activity).get(GameViewModel.class);
     }
 
     @Override

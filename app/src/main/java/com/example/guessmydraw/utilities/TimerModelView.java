@@ -35,6 +35,7 @@ public class TimerModelView extends ViewModel {
 
                 public void onTick(long millisUntilFinished) {
                     timerLiveData.setValue(millisUntilFinished);
+                    Log.d("TIMER", "tick: " + (millisUntilFinished/1000));
                 }
 
                 public void onFinish() {

@@ -3,6 +3,7 @@ package com.example.guessmydraw.connection;
 import android.util.Log;
 
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 
 import com.example.guessmydraw.connection.messages.AckMessage;
 import com.example.guessmydraw.connection.messages.AnswerMessage;
@@ -23,9 +24,15 @@ public class Receiver extends Thread {
     public static final int RECEIVER_PORT = 5555;
     private static final int BUFF_SIZE = 4096;
 
-    private final NetworkEventCallback callback;
+    private NetworkEventCallback callback;
+
+    public Receiver(){ }
 
     public Receiver(final NetworkEventCallback callback){
+        this.callback = callback;
+    }
+
+    public void setNetworkEventCallback(@NonNull NetworkEventCallback callback){
         this.callback = callback;
     }
 
@@ -35,8 +42,6 @@ public class Receiver extends Thread {
         try (DatagramSocket client = new DatagramSocket(null)){
             client.setReuseAddress(true);
             client.bind(new InetSocketAddress(RECEIVER_PORT));
-
-        //try (DatagramSocket client = new DatagramSocket(RECEIVER_PORT) ){
 
             while (!Thread.interrupted()){
 
@@ -48,6 +53,11 @@ public class Receiver extends Thread {
 
                 byte[] bf = receivedPacket.getData();
                 byte type = bf[0];
+
+                if (callback == null){
+                    Log.e("DEBUG-Receiver", "Callback is null.");
+                    break;
+                }
 
                 if (type == DrawMessage.NET_ID) {
                     Log.d("DEBUG-Receiver", "packet DrawMessage received.");

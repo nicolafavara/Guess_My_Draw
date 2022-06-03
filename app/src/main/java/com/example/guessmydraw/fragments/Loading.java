@@ -46,14 +46,16 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     private TextView addressTextView;
     private GameViewModel gameViewModel;
 
-    public Loading() {
-        this.receiver = new Receiver(this);
-        this.receiver.start();
-    }
+    public Loading() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        MainActivity activity = (MainActivity) requireActivity();
+
+        //register for callback to the activity receiver
+        activity.registerForReceiver(this);
 
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
@@ -62,7 +64,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
                 new DisconnectionDialog().show(getChildFragmentManager(), DisconnectionDialog.TAG);
             }
         };
-        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+        activity.getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override

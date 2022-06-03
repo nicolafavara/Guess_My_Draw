@@ -90,7 +90,6 @@ import com.example.guessmydraw.utilities.TimerModelView;
         });
 
         binding.sendButton.setOnClickListener(view -> {
-
             String answer = binding.answerEditText.getText().toString();
             if(!answer.equals("")){
 

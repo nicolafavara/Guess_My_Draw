@@ -52,6 +52,7 @@ public class GameViewModel extends AndroidViewModel {
         this.roundNumber++;
         this.isFirstMsg = true;
         this.bitmap = null;
+        this.myEndRequest = false;
     }
 
     public int askToEndGame() {
