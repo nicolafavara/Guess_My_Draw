@@ -42,6 +42,8 @@ public class MatchResults extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        ((DeviceList.DeviceActionListener) requireActivity()).disconnect();
+
         // Inflate the layout for this fragment
         binding = FragmentMatchResultsBinding.inflate(inflater, container, false);
 
@@ -62,7 +64,7 @@ public class MatchResults extends Fragment {
 
         Button button = binding.returnToFirstScreenButton;
         button.setOnClickListener(view -> {
-            ((DeviceList.DeviceActionListener) requireActivity()).disconnect();
+            NavHostFragment.findNavController(this).navigate(R.id.return_to_first_screen);
         });
         return binding.getRoot();
     }

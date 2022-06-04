@@ -51,9 +51,6 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
 
         activity = (MainActivity) requireActivity();
 
-        //register for callback to the activity receiver
-        activity.registerForReceiver(this);
-
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -67,6 +64,10 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        //register for callback to the activity receiver
+        activity.registerForReceiver(this);
+
         // Inflate the layout for this fragment
         binding = FragmentLoadingBinding.inflate(inflater, container, false);
         return binding.getRoot();
@@ -101,13 +102,16 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
             Log.d(TAG, "info.groupFormed: " + info.groupFormed + "info.isGroupOwner: " + info.isGroupOwner);
             if (info.groupFormed && info.isGroupOwner) { //we are the group owner
 
-                this.groupOwnerFlag = true;
+                groupOwnerFlag = true;
                 Log.d(TAG, "I'm the group owner.");
-                this.gameViewModel.setGroupOwnerFlag(true);
+                gameViewModel.setGroupOwnerFlag(true);
+                gameViewModel.setMyTurnToDraw(true);
             }
             else if (info.groupFormed) { //we are a peer
 
-                this.gameViewModel.setOpponentAddress(groupOwnerAddress);
+                assert groupOwnerAddress != null;
+                gameViewModel.setOpponentAddress(groupOwnerAddress);
+                gameViewModel.setMyTurnToDraw(false);
                 activity.initSenders(groupOwnerAddress);
                 //sends a packet to the group owner to let him know the IP address of the peer
                 sendHandshakeMessage(true);
@@ -140,11 +144,10 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     @Override
     public void onHandshakeMessageReceived(InetAddress address, String opponentsName) {
 
-
         Log.d(TAG, "onHandshakeMessageReceived: " + address.getHostAddress());
         if (groupOwnerFlag){
             //we are the group owner, so we use the message received to save the peer's address
-            this.gameViewModel.setOpponentAddress(Objects.requireNonNull(address.getHostAddress()));
+            gameViewModel.setOpponentAddress(Objects.requireNonNull(address.getHostAddress()));
             activity.initSenders(address.getHostAddress());
             sendHandshakeMessage(false);
         }
@@ -153,7 +156,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
             activity.stopSenderInLoop();
         }
 
-        this.gameViewModel.setOpponentsName(opponentsName);
+        gameViewModel.setOpponentsName(opponentsName);
         mainHandler.post(() -> {
                 Log.d(TAG, "STARTING LOBBY");
                 NavHostFragment.findNavController(this).navigate(R.id.start_lobby);
@@ -178,6 +181,9 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
 
     @Override
     public void onAckMessageReceived() {/*EMPTY*/}
+
+    @Override
+    public void onStartDrawMessageReceived() {/*EMPTY*/}
 
     public interface GameCallback {
         void askForConnectionInfo(WifiP2pManager.ConnectionInfoListener listener);

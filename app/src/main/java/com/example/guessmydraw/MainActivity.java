@@ -43,7 +43,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity
         implements FirstScreen.FirstScreenListener, DeviceList.DeviceActionListener, Loading.GameCallback {
 
-    static final String TAG = "DEBUG_MainActivity";
+    private static final String TAG = "DEBUG_MainActivity";
     private ActivityMainBinding binding;
 
     private final IntentFilter intentFilter = new IntentFilter();
@@ -56,11 +56,7 @@ public class MainActivity extends AppCompatActivity
     private BroadcastReceiver broadcastReceiver = null;
 
     private GameViewModel gameViewModel;
-    //private ActivityViewModel activityViewModel;
-
-    private Receiver receiver;
-    private Sender mainSender;
-    private SenderInLoop mainSenderInLoop;
+    private ActivityViewModel activityViewModel;
 
     // Register the permissions callback, which handles the user's response to the
     // system permissions dialog. Save the return value, an instance of
@@ -98,8 +94,7 @@ public class MainActivity extends AppCompatActivity
         channel = manager.initialize(this, getMainLooper(), null);
 
         gameViewModel = new ViewModelProvider(this).get(GameViewModel.class);
-        //activityViewModel = new ViewModelProvider(this).get(ActivityViewModel.class);
-
+        activityViewModel = new ViewModelProvider(this).get(ActivityViewModel.class);
     }
 
     /**
@@ -170,15 +165,6 @@ public class MainActivity extends AppCompatActivity
         if (deviceListFrag != null) {
             deviceListFrag.clearPeers();
         }
-    }
-
-    public void registerForReceiver(@NonNull NetworkEventCallback callback){
-        if (receiver == null){
-            receiver = new Receiver();
-            receiver.start();
-            Log.e(TAG, "RECEIVER IS NULL !!!");
-        }
-        receiver.setNetworkEventCallback(callback);
     }
 
     private boolean checkBeforeDiscovery(){
@@ -293,9 +279,6 @@ public class MainActivity extends AppCompatActivity
                 if (!fragmentLabel.equals(getResources().getString(R.string.match_results_label))){
                     Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.disconnection);
                 }
-                else{
-                    Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.return_to_first_screen);
-                }
 
                 Log.d(TAG, "Disconnection completed.");
                 isWifiP2pConnected = false;
@@ -318,26 +301,25 @@ public class MainActivity extends AppCompatActivity
         return null;
     }
 
+    public void registerForReceiver(@NonNull NetworkEventCallback callback){
+        activityViewModel.registerForReceiver(callback);
+    }
+
     public void initSenders(String address){
-        Log.d(TAG, "INIT_SENDERS");
-        this.mainSender = new Sender(address);
-        this.mainSender.start();
-        this.mainSenderInLoop = new SenderInLoop(address);
-        this.mainSenderInLoop.start();
+        activityViewModel.initSenders(address);
     }
 
     public void sendMessage(Bundle bundle){
-        Log.d(TAG, "sendMessage");
-        this.mainSender.sendMessage(bundle);
+        activityViewModel.sendMessage(bundle);
     }
 
     public void sendMessageInLoop(Bundle bundle){
-        Log.d(TAG, "sendMessageInLoop");
-        this.mainSenderInLoop.sendMessage(bundle);
+        activityViewModel.sendMessageInLoop(bundle);
     }
 
     public void stopSenderInLoop(){
-        this.mainSenderInLoop.stopLoop();
+        //TODO NullPointerException
+        activityViewModel.stopSenderInLoop();
     }
 
 }

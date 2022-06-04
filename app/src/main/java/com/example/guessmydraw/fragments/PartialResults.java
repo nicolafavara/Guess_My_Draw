@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
@@ -46,9 +47,6 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
 
         activity = (MainActivity) requireActivity();
 
-        //register for callback to the activity receiver
-        activity.registerForReceiver(this);
-
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -60,8 +58,11 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        //register for callback to the activity receiver
+        activity.registerForReceiver(this);
+
         // Inflate the layout for this fragment
         binding = FragmentPartialResultsBinding.inflate(inflater, container, false);
         TextView scorePlayerOneTextView = binding.scorePlayerOne;
@@ -132,6 +133,7 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
         mainHandler.post(() -> {
             this.endMatchButton.setText(text);
             if(n == 2){
+                Toast.makeText(activity, "Numero di richieste per terminare la partita raggiunte.", Toast.LENGTH_SHORT).show();
                 NavHostFragment.findNavController(this).navigate(R.id.end_match);
             }
         });
@@ -144,6 +146,9 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
 
     @Override
     public void onAckMessageReceived() {/*EMPTY*/}
+
+    @Override
+    public void onStartDrawMessageReceived() {/*EMPTY*/}
 
     @Override
     public void onHandshakeMessageReceived(InetAddress address, String opponentsName) {/*EMPTY*/}

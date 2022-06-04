@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavDestination;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 
@@ -20,6 +21,8 @@ import com.example.guessmydraw.fragments.DeviceList;
 import com.example.guessmydraw.fragments.FirstScreen;
 import com.example.guessmydraw.fragments.GameLobby;
 import com.example.guessmydraw.fragments.Loading;
+
+import java.util.Objects;
 
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
@@ -113,17 +116,21 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 Log.d(TAG, "Network Info: Not Connected.");
                 activity.isWifiP2pConnected = false;
 
-                Fragment frag = activity.getForegroundFragment();
+                NavDestination dest = Navigation.findNavController(activity, R.id.my_nav_host_fragment).getCurrentDestination();
+                if (dest == null) return;
 
-                //TODO TROVARE UN MODO PIU' "PULITO" PER FARLO
-                if(frag != null && !frag.toString().startsWith(firstFragmentClassName)
-                        && !frag.toString().startsWith(deviceListClassName)){
+                String fragmentLabel = Objects.requireNonNull(dest.getLabel()).toString();
+
+                if(!fragmentLabel.equals(activity.getResources().getString(R.string.first_screen_label))
+                    && !fragmentLabel.equals(activity.getResources().getString(R.string.device_list_label))
+                        && !fragmentLabel.equals(activity.getResources().getString(R.string.match_results_label))){
 
                     Log.d(TAG, "Connection interrupted...returning to device list fragment. ");
 
                     Toast.makeText(activity, R.string.p2p_disconnection, Toast.LENGTH_LONG).show();
                     Navigation.findNavController(activity, R.id.my_nav_host_fragment).navigate(R.id.disconnection);
                 }
+
             }
         }
         //else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {}

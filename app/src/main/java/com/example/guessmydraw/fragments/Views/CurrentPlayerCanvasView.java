@@ -75,7 +75,6 @@ public class CurrentPlayerCanvasView extends View {
 
         if (gameViewModel.getBitmap() != null){
             extraBitmap = gameViewModel.getBitmap();
-            Toast.makeText((MainActivity)getContext(), "Copied", Toast.LENGTH_SHORT).show();
         }
 
         extraCanvas.setBitmap(extraBitmap);

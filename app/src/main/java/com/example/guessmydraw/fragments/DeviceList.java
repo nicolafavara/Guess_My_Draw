@@ -115,46 +115,8 @@ public class DeviceList extends Fragment implements WifiP2pManager.PeerListListe
     }
 
     public interface DeviceActionListener {
-
         void refresh();
-
         void connect(WifiP2pConfig config);
-
         void disconnect();
     }
-
-//    private static String getDeviceStatus(int deviceStatus) {
-//        Log.d("DEBUG", "Peer status :" + deviceStatus);
-//        switch (deviceStatus) {
-//            case WifiP2pDevice.AVAILABLE:
-//                return "Available";
-//            case WifiP2pDevice.INVITED:
-//                return "Invited";
-//            case WifiP2pDevice.CONNECTED:
-//                return "Connected";
-//            case WifiP2pDevice.FAILED:
-//                return "Failed";
-//            case WifiP2pDevice.UNAVAILABLE:
-//                return "Unavailable";
-//            default:
-//                return "Unknown";
-//
-//        }
-//    }
-//
-//    /**
-//     * Update UI for this device.
-//     *
-//     * @param device WifiP2pDevice object
-//     */
-//    public void updateThisDevice(WifiP2pDevice device) {
-//        this.dev = device;
-//        StringBuilder s = new StringBuilder();
-//        s.append("device name = ").append(device.deviceName).append(", device status = ").append(getDeviceStatus(device.status));
-//        Log.d("DEBUG", s.toString());
-////        TextView view = (TextView) mContentView.findViewById(R.id.my_name);
-////        view.setText(device.deviceName);
-////        view = (TextView) mContentView.findViewById(R.id.my_status);
-////        view.setText(getDeviceStatus(device.status));
-//    }
 }

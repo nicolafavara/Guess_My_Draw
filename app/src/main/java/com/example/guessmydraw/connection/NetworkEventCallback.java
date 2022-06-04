@@ -12,5 +12,6 @@ public interface NetworkEventCallback {
     void onTimerExpiredMessage();
     void onEndingMessageReceived();
     void onAckMessageReceived();
+    void onStartDrawMessageReceived();
 }
 

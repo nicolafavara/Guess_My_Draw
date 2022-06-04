@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.Sender;
+import com.example.guessmydraw.connection.messages.StartDrawMessage;
 import com.example.guessmydraw.connection.messages.TimerExpiredMessage;
 import com.example.guessmydraw.connection.messages.WinMessage;
 import com.example.guessmydraw.databinding.FragmentCanvasOtherPlayerBinding;
@@ -128,6 +129,8 @@ import com.example.guessmydraw.utilities.TimerModelView;
          // Hide status bar
          View windowDecorView = activity.getWindow().getDecorView();
          windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+        //TODO MANDARE SOLO LA PRIMA VOLTA
+         sendStartDrawMessage();
      }
 
      @Override
@@ -141,6 +144,13 @@ import com.example.guessmydraw.utilities.TimerModelView;
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
         activity.sendMessage(bundle);
     }
+
+     private void sendStartDrawMessage() {
+         StartDrawMessage messageToSend = new StartDrawMessage();
+         bundle.clear();
+         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
+         activity.sendMessage(bundle);
+     }
 
     private void sendTimerExpiredMessage(){
         TimerExpiredMessage messageToSend = new TimerExpiredMessage();

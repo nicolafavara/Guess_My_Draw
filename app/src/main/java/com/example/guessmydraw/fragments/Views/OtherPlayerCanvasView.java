@@ -28,6 +28,7 @@ import java.net.InetAddress;
 
 public class OtherPlayerCanvasView extends View implements NetworkEventCallback {
 
+    private final static String TAG = "OTHER_CANVAS_VIEW";
     private GameViewModel gameViewModel;
 
     private final Paint paint;
@@ -52,10 +53,15 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
         this.paint.setStrokeCap(Paint.Cap.ROUND);
         this.paint.setStrokeWidth(12.0F);
 
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
         MainActivity activity = (MainActivity) getContext();
+        gameViewModel = new ViewModelProvider(activity).get(GameViewModel.class);
         //register for callback to the activity receiver
         activity.registerForReceiver(this);
-        gameViewModel = new ViewModelProvider(activity).get(GameViewModel.class);
     }
 
     @Override
@@ -93,7 +99,12 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
     @Override
     public void onDrawMessageReceived(DrawMessage message) {
 
-        Log.d("DEBUG", message.toString());
+        Log.d(TAG, message.toString());
+
+        if(extraCanvas == null){
+            Log.e(TAG, "EXTRA CANVAS IS NULL.");
+            return;
+        }
 
         if (gameViewModel.getIsFirstMsg()){
             Fragment frag = ((MainActivity) getContext()).getForegroundFragment();
@@ -150,6 +161,9 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
 
     @Override
     public void onAckMessageReceived() {/*EMPTY*/}
+
+    @Override
+    public void onStartDrawMessageReceived() {/*EMPTY*/}
 
     @Override
     public void onHandshakeMessageReceived(InetAddress address, String opponentsName) {/*EMPTY*/}

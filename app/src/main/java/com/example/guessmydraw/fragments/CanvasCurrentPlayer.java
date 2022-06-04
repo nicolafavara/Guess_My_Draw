@@ -53,9 +53,6 @@ import java.net.InetAddress;
 
         activity = (MainActivity) requireActivity();
 
-        //register for callback to the activity receiver
-        activity.registerForReceiver(this);
-
         // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
@@ -71,6 +68,9 @@ import java.net.InetAddress;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //register for callback to the activity receiver
+        activity.registerForReceiver(this);
+
         // Inflate the layout for this fragment
         binding = FragmentCanvasCurrentPlayerBinding.inflate(inflater, container, false);
         binding.buttonColorBlack.setOnClickListener(this);
@@ -90,6 +90,11 @@ import java.net.InetAddress;
         String wordToDraw = gameViewModel.getChoosenWord();
         binding.wordToDraw.setText(wordToDraw);
         canvasView = binding.currentPlayerCanvasView;
+
+        // TODO SE IL GIOCATORE CORRENTE E' ANCORA NEL PARTIAL RESULT FRAGMENT...
+        if(!gameViewModel.isStartDrawFlag()){
+            canvasView.setVisibility(View.INVISIBLE);
+        }
 
         return binding.getRoot();
     }
@@ -131,6 +136,14 @@ import java.net.InetAddress;
          mainHandler.post(()->{
              Toast.makeText(getContext(), "Il tuo avversario ha perso!", Toast.LENGTH_LONG).show();
              NavHostFragment.findNavController(this).navigate(R.id.end_round);
+         });
+     }
+
+     @Override
+     public void onStartDrawMessageReceived() {
+         gameViewModel.setStartDrawFlag(true);
+         mainHandler.post(()->{
+             canvasView.setVisibility(View.VISIBLE);
          });
      }
 

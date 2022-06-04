@@ -43,6 +43,9 @@
         <action
             android:id="@+id/start_word_list"
             app:destination="@id/choose_word" />
+        <action
+            android:id="@+id/end_match"
+            app:destination="@id/match_results" />
     </fragment>
     <fragment
         android:id="@+id/canvas_current_player"

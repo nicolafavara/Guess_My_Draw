@@ -6,8 +6,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 public class GameViewModel extends AndroidViewModel {
 
@@ -15,6 +13,8 @@ public class GameViewModel extends AndroidViewModel {
     private boolean isMyTurnToDraw;
     private boolean isFirstMsg;
     private boolean myEndRequest;
+    private boolean ackMessageFlag;
+    private boolean startDrawFlag;
     private String playersName;
     private String opponentsName;
     private String opponentAddress;
@@ -30,16 +30,19 @@ public class GameViewModel extends AndroidViewModel {
     }
 
     public void init(){
-        this.groupOwnerFlag = false;
-        this.isMyTurnToDraw = false;
-        this.opponentAddress = null;
-        this.scorePlayerOne = 0;
-        this.scorePlayerTwo = 0;
-        this.roundNumber = 0;
-        this.choosenWord = null;
-        this.endGameRequests = 0;
-        this.isFirstMsg = true;
-        this.bitmap = null;
+        groupOwnerFlag = false;
+        isMyTurnToDraw = false;
+        isFirstMsg = true;
+        ackMessageFlag = false;
+        startDrawFlag = false;
+        endGameRequests = 0;
+        scorePlayerOne = 0;
+        scorePlayerTwo = 0;
+        roundNumber = 0;
+        opponentAddress = null;
+        choosenWord = null;
+        bitmap = null;
+
     }
 
     public int getRoundNumber() {
@@ -48,15 +51,17 @@ public class GameViewModel extends AndroidViewModel {
 
     public void setNextRound(){
         Log.d("DEBUG", "NEXT ROUND !!!");
-        this.choosenWord = null;
-        this.roundNumber++;
-        this.isFirstMsg = true;
-        this.bitmap = null;
-        this.myEndRequest = false;
+        choosenWord = null;
+        roundNumber++;
+        isFirstMsg = true;
+        bitmap = null;
+        myEndRequest = false;
+        ackMessageFlag = false;
+        startDrawFlag = false;
     }
 
     public int askToEndGame() {
-        this.endGameRequests++;
+        endGameRequests++;
         return endGameRequests;
     }
 
@@ -105,11 +110,11 @@ public class GameViewModel extends AndroidViewModel {
     }
 
     public void setOpponentAddress(@NonNull String address){
-        this.opponentAddress = address;
+        opponentAddress = address;
     }
 
     public String getOpponentAddress() {
-        return this.opponentAddress;
+        return opponentAddress;
     }
 
     public void setGroupOwnerFlag(boolean b){
@@ -133,7 +138,7 @@ public class GameViewModel extends AndroidViewModel {
     }
 
     public void setIsFirstMsg(boolean value) {
-        this.isFirstMsg = value;
+        isFirstMsg = value;
     }
 
     public boolean isMyEndRequest() {
@@ -152,15 +157,40 @@ public class GameViewModel extends AndroidViewModel {
         this.bitmap = bitmap;
     }
 
+    public boolean isAckMessageFlag() {
+        return ackMessageFlag;
+    }
+
+    public void setAckMessageFlag(boolean ackMessageFlag) {
+        this.ackMessageFlag = ackMessageFlag;
+    }
+
+    public boolean isStartDrawFlag() {
+        return startDrawFlag;
+    }
+
+    public void setStartDrawFlag(boolean startDrawFlag) {
+        this.startDrawFlag = startDrawFlag;
+    }
+
     @Override
     public String toString() {
-        return "MatchViewModel{" +
-                "opponentAddress='" + opponentAddress + '\'' +
-                ", groupOwnerFlag=" + groupOwnerFlag +
-                ", scorePlayerOne=" + scorePlayerOne +
-                ", scorePlayerTwo=" + scorePlayerTwo +
-                ", roundNumber=" + roundNumber +
-                ", choosenWord='" + choosenWord + '\'' +
+        return "GameViewModel{" +
+                "groupOwnerFlag=" + groupOwnerFlag + "\n" +
+                ", isMyTurnToDraw=" + isMyTurnToDraw + "\n" +
+                ", isFirstMsg=" + isFirstMsg + "\n" +
+                ", myEndRequest=" + myEndRequest + "\n" +
+                ", ackMessageFlag=" + ackMessageFlag + "\n" +
+                ", startDrawFlag=" + startDrawFlag + "\n" +
+                ", playersName='" + playersName + '\'' + "\n" +
+                ", opponentsName='" + opponentsName + '\'' + "\n" +
+                ", opponentAddress='" + opponentAddress + '\'' + "\n" +
+                ", choosenWord='" + choosenWord + '\'' + "\n" +
+                ", scorePlayerOne=" + scorePlayerOne + "\n" +
+                ", scorePlayerTwo=" + scorePlayerTwo + "\n" +
+                ", roundNumber=" + roundNumber + "\n" +
+                ", endGameRequests=" + endGameRequests + "\n" +
+                ", bitmap=" + bitmap + "\n" +
                 '}';
     }
 }

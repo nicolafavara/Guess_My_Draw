@@ -21,21 +21,25 @@
         android:textStyle="bold"
         tools:text="Parola"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/current_player_canvas_view"/>
 
     <com.example.guessmydraw.fragments.Views.CurrentPlayerCanvasView
         android:id="@+id/current_player_canvas_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/colorCanvas"
-        app:layout_constraintVertical_bias="0.3"
         app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintBottom_toTopOf="@id/palette"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/word_to_draw"
+        />
 
     <GridLayout
+        android:id="@+id/palette"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -48,6 +52,7 @@
 
         <androidx.appcompat.widget.AppCompatButton
             style="@style/palette_color_button"
+
             android:id="@+id/button_color_black"
             android:background="@color/black"
             android:layout_width="wrap_content"

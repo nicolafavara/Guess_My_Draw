@@ -10,6 +10,7 @@ import com.example.guessmydraw.connection.messages.AnswerMessage;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.messages.EndingMessage;
 import com.example.guessmydraw.connection.messages.HandshakeMessage;
+import com.example.guessmydraw.connection.messages.StartDrawMessage;
 import com.example.guessmydraw.connection.messages.TimerExpiredMessage;
 import com.example.guessmydraw.connection.messages.WinMessage;
 import com.example.guessmydraw.fragments.GameLobby;
@@ -89,6 +90,10 @@ public class Receiver extends Thread {
                 else if (type == AckMessage.NET_ID) {
                     Log.d("DEBUG-Receiver", "packet AckMessage received.");
                     callback.onAckMessageReceived();
+                }
+                else if (type == StartDrawMessage.NET_ID) {
+                    Log.d("DEBUG-Receiver", "packet AckMessage received.");
+                    callback.onStartDrawMessageReceived();
                 }
                 else {
                     throw new RuntimeException("Unknown NET ID!");
