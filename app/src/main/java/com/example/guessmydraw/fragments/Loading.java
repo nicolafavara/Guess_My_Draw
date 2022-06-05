@@ -17,12 +17,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.NetworkEventCallback;
-import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.Sender;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.messages.HandshakeMessage;
@@ -39,7 +37,6 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     private final static String TAG = "LOADING_FRAGMENT";
     private FragmentLoadingBinding binding;
 
-    private boolean groupOwnerFlag = false;
     private GameViewModel gameViewModel;
 
     public Loading() {}
@@ -59,8 +56,10 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
+        gameViewModel.init();
 
         //register for callback to the activity receiver
         ((MainActivity)requireActivity()).registerForReceiver(this);
@@ -73,8 +72,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
-        gameViewModel.init();
+        //request for wifiP2p requestConnectionInfo() method
         ((MainActivity)requireActivity()).askForConnectionInfo(this);
     }
 
@@ -98,7 +96,6 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
             Log.d(TAG, "info.groupFormed: " + info.groupFormed + "info.isGroupOwner: " + info.isGroupOwner);
             if (info.groupFormed && info.isGroupOwner) { //we are the group owner
 
-                groupOwnerFlag = true;
                 Log.d(TAG, "I'm the group owner.");
                 gameViewModel.setGroupOwnerFlag(true);
                 gameViewModel.setMyTurnToDraw(true);
@@ -141,7 +138,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     public void onHandshakeMessageReceived(InetAddress address, String opponentsName) {
 
         Log.d(TAG, "onHandshakeMessageReceived: " + address.getHostAddress());
-        if (groupOwnerFlag){
+        if (gameViewModel.getGroupOwnerFlag()){
             //we are the group owner, so we use the message received to save the peer's address
             gameViewModel.setOpponentAddress(Objects.requireNonNull(address.getHostAddress()));
             ((MainActivity)requireActivity()).initSenders(address.getHostAddress());
@@ -154,8 +151,12 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
 
         gameViewModel.setOpponentsName(opponentsName);
         mainHandler.post(() -> {
-                Log.d(TAG, "STARTING LOBBY");
-                NavHostFragment.findNavController(this).navigate(R.id.start_lobby);
+
+                String fragmentLabel = ((MainActivity) requireActivity()).getForegroundFragmentLabel();
+                if(fragmentLabel.equals(getResources().getString(R.string.loading_label))){
+                    Log.d(TAG, "STARTING LOBBY");
+                    NavHostFragment.findNavController(this).navigate(R.id.start_lobby);
+                }
             }
         );
     }

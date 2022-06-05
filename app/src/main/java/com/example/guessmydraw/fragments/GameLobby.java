@@ -44,9 +44,9 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     private Button playButton;
     private Button chooseWordButton;
 
+    private MutableLiveData<String> chosenWord;
     private TextView roleTextView;
     private TextView wordTextView;
-    private MutableLiveData<String> chosenWord;
 
     private GameViewModel gameViewModel;
 
@@ -71,6 +71,9 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
+        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
+
+        Log.d(TAG, "Registering for receiver...");
         //register for callback to the activity receiver
         ((MainActivity)requireActivity()).registerForReceiver(this);
 
@@ -107,18 +110,8 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        // Hide status bar
-        View windowDecorView = requireActivity().getWindow().getDecorView();
-        windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-    }
-
-    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
 
         NavController navController = Navigation.findNavController(requireActivity(), R.id.my_nav_host_fragment);
         chosenWord = navController.getCurrentBackStackEntry().getSavedStateHandle().getLiveData("chosenWord");
@@ -140,6 +133,14 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
         if (gameViewModel.isAckMessageFlag()){
             playButton.setEnabled(true);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Hide status bar
+        View windowDecorView = requireActivity().getWindow().getDecorView();
+        windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
     private void determCurrent(){
@@ -182,7 +183,6 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
      * used by current player to send answer to the other player
      */
     private void sendAnswer(@NonNull String answer) {
-
         Log.d(TAG, "sending answer(" + answer + ") to other player.");
         AnswerMessage messageToSend = new AnswerMessage();
         messageToSend.setAnswer(answer);
@@ -200,9 +200,8 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
 
     @Override
     public void onAnswerMessageReceived(String answer) {
-
+        //TODO CHECK
         sendAck();
-        //TODO gameViewModel può essere null se il messaggio arriva "quando il fragment sta diventando visibile"
         gameViewModel.setAckMessageFlag(true);
 
         Log.d(TAG, "answer received (" + answer + ").");
@@ -216,19 +215,12 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
 
     @Override
     public void onAckMessageReceived() {
-
-        //TODO gameViewModel può essere null se il metodo viene chiamato non appena si accede a questo fragment
-        if(gameViewModel != null){
-
-            gameViewModel.setAckMessageFlag(true);
-            ((MainActivity)requireActivity()).stopSenderInLoop();
-            mainHandler.post(()-> {
-                playButton.setEnabled(true);
-            });
-        }
-        else{
-            Log.e(TAG, "GameViewModel is NULL");
-        }
+        //TODO CHECK
+        gameViewModel.setAckMessageFlag(true);
+        ((MainActivity)requireActivity()).stopSenderInLoop();
+        mainHandler.post(()-> {
+            playButton.setEnabled(true);
+        });
     }
 
     @Override

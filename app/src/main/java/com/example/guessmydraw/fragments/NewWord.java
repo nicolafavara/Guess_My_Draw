@@ -25,9 +25,7 @@ public class NewWord extends Fragment {
     private FragmentNewWordBinding binding;
     private WordViewModel wordViewModel;
 
-    public NewWord() {
-        // Required empty public constructor
-    }
+    public NewWord() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

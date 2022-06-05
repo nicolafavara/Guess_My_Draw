@@ -33,6 +33,7 @@ import java.net.InetAddress;
 
      private final Handler mainHandler = new Handler(Looper.getMainLooper());
      private FragmentCanvasCurrentPlayerBinding binding;
+     private final static String TAG = "CanvasCurrentPlayer";
 
      //viewModel used to save all the information needed for the match
      private GameViewModel gameViewModel;
@@ -65,8 +66,10 @@ import java.net.InetAddress;
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+         gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
+
         //register for callback to the activity receiver
         ((MainActivity)requireActivity()).registerForReceiver(this);
 
@@ -87,7 +90,6 @@ import java.net.InetAddress;
         binding.buttonColorPurple.setOnClickListener(this);
         binding.buttonColorViolet.setOnClickListener(this);
 
-        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
         //we take from the viewModel the current word to draw and display it
         String wordToDraw = gameViewModel.getChoosenWord();
         binding.wordToDraw.setText(wordToDraw);
@@ -144,10 +146,13 @@ import java.net.InetAddress;
 
      @Override
      public void onStartDrawMessageReceived() {
-         gameViewModel.setStartDrawFlag(true);
-         mainHandler.post(()->{
-             canvasView.setVisibility(View.VISIBLE);
-         });
+         if (!gameViewModel.isStartDrawFlag()){
+             Log.d(TAG, "StartDrawMessage received.");
+             gameViewModel.setStartDrawFlag(true);
+             mainHandler.post(()->{
+                 canvasView.setVisibility(View.VISIBLE);
+             });
+         }
      }
 
      @Override

@@ -29,7 +29,6 @@ public class Sender extends Thread {
     protected InetAddress dstAddress;
 
     private String destName;
-    private final Lock handlerLock = new ReentrantLock();
     private final Queue<Bundle> enqueuedMessages = new LinkedList<>();
 
     public Sender(){}
@@ -61,28 +60,30 @@ public class Sender extends Thread {
             }
         };
 
-        handlerLock.lock();
+        synchronized (enqueuedMessages){
+
             while (!enqueuedMessages.isEmpty()) {
                 Message msg = mHandler.obtainMessage();
                 msg.setData(enqueuedMessages.poll());
                 mHandler.sendMessage(msg);
             }
-        handlerLock.unlock();
+        }
 
         Looper.loop();
     }
 
     public void sendMessage(Bundle msgData) {
-        handlerLock.lock();
+
+        synchronized (enqueuedMessages) {
             if (mHandler != null) {
                 Message msg = mHandler.obtainMessage();
                 msg.setData(msgData);
                 mHandler.sendMessage(msg);
-            }
-            else {
+            } else {
+                //enqueue the message if the handler wasn't already instantiated
                 enqueuedMessages.add(msgData);
             }
-        handlerLock.unlock();
+        }
     }
 
     protected void sendPacket(Parcelable msg){

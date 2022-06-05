@@ -109,6 +109,9 @@
         <action
             android:id="@+id/return_word_to_lobby"
             app:destination="@id/game_lobby" />
+        <action
+            android:id="@+id/end_match"
+            app:destination="@id/match_results" />
     </fragment>
     <fragment
         android:id="@+id/partial_results"

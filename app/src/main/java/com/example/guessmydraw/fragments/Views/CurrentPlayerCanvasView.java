@@ -22,7 +22,7 @@ import com.example.guessmydraw.utilities.GameViewModel;
 public class CurrentPlayerCanvasView extends View {
 
     //viewModel used to save all the information needed for the match
-    private final GameViewModel gameViewModel;
+    private GameViewModel gameViewModel;
 
     private final int touchTolerance;
     private Canvas extraCanvas;
@@ -37,11 +37,9 @@ public class CurrentPlayerCanvasView extends View {
     private float currentY;
 
     public CurrentPlayerCanvasView(Context context, AttributeSet attrs) {
-
         super(context, attrs);
-        touchTolerance = ViewConfiguration.get(context).getScaledTouchSlop();
 
-        gameViewModel = new ViewModelProvider(((MainActivity) getContext())).get(GameViewModel.class);
+        touchTolerance = ViewConfiguration.get(context).getScaledTouchSlop();
 
         //set the color we will use to paint
         int paintColor = ResourcesCompat.getColor(this.getResources(), R.color.colorPaint, null);
@@ -56,6 +54,20 @@ public class CurrentPlayerCanvasView extends View {
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setStrokeWidth(12.0F);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        MainActivity activity = (MainActivity) getContext();
+        gameViewModel = new ViewModelProvider(activity).get(GameViewModel.class);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        //we save the current bitmap to restore it when the view is recreated
+        gameViewModel.setBitmap(extraBitmap);
     }
 
     @Override
@@ -80,13 +92,6 @@ public class CurrentPlayerCanvasView extends View {
     protected void onDraw(Canvas canvas) { //this canvas is not our this.extraCanvas
         super.onDraw(canvas);
         canvas.drawBitmap(extraBitmap, 0f, 0f, paint);
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        //we save the current bitmap to restore it when the view is recreated
-        gameViewModel.setBitmap(extraBitmap);
     }
 
     public void changePaintColor(int color){

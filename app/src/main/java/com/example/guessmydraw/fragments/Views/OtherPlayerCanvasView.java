@@ -9,7 +9,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
@@ -18,7 +17,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.NetworkEventCallback;
-import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.fragments.CanvasOtherPlayer;
 import com.example.guessmydraw.utilities.GameViewModel;
@@ -59,10 +57,16 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        MainActivity activity = (MainActivity) getContext();
-        gameViewModel = new ViewModelProvider(activity).get(GameViewModel.class);
+        gameViewModel = new ViewModelProvider((MainActivity) getContext()).get(GameViewModel.class);
         //register for callback to the activity receiver
-        activity.registerForReceiver(this);
+        ((MainActivity) getContext()).registerForReceiver(this);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        //we save the current bitmap to restore it when the view is recreated
+        gameViewModel.setBitmap(extraBitmap);
     }
 
     @Override
@@ -87,13 +91,6 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
         super.onDraw(canvas);
         canvas.drawBitmap(extraBitmap, 0f, 0f, paint);
         invalidate();
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        //we save the current bitmap to restore it when the view is recreated
-        gameViewModel.setBitmap(extraBitmap);
     }
 
     @Override

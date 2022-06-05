@@ -288,16 +288,12 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess() {
-
-                Log.d(TAG, "Disconnected.");
-
                 String fragmentLabel = getForegroundFragmentLabel();
                 if (!fragmentLabel.equals(getResources().getString(R.string.match_results_label))){
                     Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.disconnection);
                 }
-
-                Log.d(TAG, "Disconnection completed.");
                 isWifiP2pConnected = false;
+                Log.d(TAG, "Disconnection completed.");
             }
 
         });
@@ -340,4 +336,6 @@ public class MainActivity extends AppCompatActivity
     public void stopSenderInLoop(){
         mainSenderInLoop.stopLoop();
     }
+
+    //end region
 }

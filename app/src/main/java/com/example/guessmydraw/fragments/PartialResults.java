@@ -57,6 +57,8 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
+
         //register for callback to the activity receiver
         ((MainActivity)requireActivity()).registerForReceiver(this);
 
@@ -66,8 +68,6 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
         TextView scorePlayerTwoTextView = binding.scorePlayerTwo;
         TextView p1Name = binding.p1Name;
         TextView p2Name = binding.p2Name;
-
-        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
 
         p1Name.setText(gameViewModel.getPlayersName());
         p2Name.setText(gameViewModel.getOpponentsName());
@@ -80,7 +80,7 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
         this.endMatchButton = binding.endMatchButton;
         int n = gameViewModel.getEndGameRequests();
         if (n != 0){
-            if(gameViewModel.isMyEndRequest()){
+            if(gameViewModel.isEndRequestFlag()){
                 endMatchButton.setEnabled(false);
             }
             String text = requireContext().getString(R.string.end_match) + " (" + n + "/2)";
@@ -94,7 +94,7 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
         this.endMatchButton.setOnClickListener(view -> {
             sendEndingMessage();
             requestEndMatch();
-            gameViewModel.setMyEndRequest(true);
+            gameViewModel.setEndRequestFlag(true);
             this.endMatchButton.setEnabled(false);
         });
 

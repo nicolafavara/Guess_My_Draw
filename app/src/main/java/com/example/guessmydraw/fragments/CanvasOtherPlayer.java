@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
@@ -34,6 +33,7 @@ import com.example.guessmydraw.utilities.TimerModelView;
  public class CanvasOtherPlayer extends Fragment implements OtherPlayerCanvasView.canvasViewCallback{
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+     private final static String TAG = "CanvasOtherPlayer";
     private FragmentCanvasOtherPlayerBinding binding;
 
     private TextView timerTextView;
@@ -68,15 +68,15 @@ import com.example.guessmydraw.utilities.TimerModelView;
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
+        rightAnswer = gameViewModel.getChoosenWord();
 
         // Inflate the layout for this fragment
         binding = FragmentCanvasOtherPlayerBinding.inflate(inflater, container, false);
+        timerTextView = binding.timerTextView;
 
-        this.timerTextView = binding.timerTextView;
-
-        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
         timerModelView = new ViewModelProvider(requireActivity()).get(TimerModelView.class);
         timerModelView.getTimerLiveData().observe(getViewLifecycleOwner(), timeLeft -> {
 
@@ -119,26 +119,19 @@ import com.example.guessmydraw.utilities.TimerModelView;
         return binding.getRoot();
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        this.rightAnswer = gameViewModel.getChoosenWord();
-    }
-
      @Override
      public void onResume() {
          super.onResume();
          // Hide status bar
          View windowDecorView = requireActivity().getWindow().getDecorView();
          windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-        //TODO MANDARE SOLO LA PRIMA VOLTA
-         sendStartDrawMessage();
-     }
 
-     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
+         if(!gameViewModel.isStartDrawFlag()){
+             Log.d(TAG, "sending StartDrawMessage...");
+             gameViewModel.setStartDrawFlag(true);
+             sendStartDrawMessage();
+         }
+     }
 
     private void sendWinMessage() {
         WinMessage messageToSend = new WinMessage();

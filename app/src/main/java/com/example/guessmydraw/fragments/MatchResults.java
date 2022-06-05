@@ -39,15 +39,17 @@ public class MatchResults extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        //if we are in this fragment then the game is over, so we perform the disconnect
         ((DeviceList.DeviceActionListener) requireActivity()).disconnect();
+
+        GameViewModel gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
 
         // Inflate the layout for this fragment
         binding = FragmentMatchResultsBinding.inflate(inflater, container, false);
 
         TextView textView = binding.resultText;
-        GameViewModel gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
         int score1 = gameViewModel.getScorePlayerOne();
         int score2 = gameViewModel.getScorePlayerTwo();
 
