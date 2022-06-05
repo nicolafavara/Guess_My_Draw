@@ -92,7 +92,7 @@ public class Receiver extends Thread {
                     callback.onAckMessageReceived();
                 }
                 else if (type == StartDrawMessage.NET_ID) {
-                    Log.d("DEBUG-Receiver", "packet AckMessage received.");
+                    Log.d("DEBUG-Receiver", "packet StartDrawMessage received.");
                     callback.onStartDrawMessageReceived();
                 }
                 else {

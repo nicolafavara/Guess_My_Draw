@@ -21,7 +21,7 @@
         android:id="@+id/device_list"
         android:name="com.example.guessmydraw.fragments.DeviceList"
         android:label="@string/device_list_label"
-        android:tag="mylist"
+        android:tag="@string/device_list_label"
         tools:layout="@layout/fragment_device_list">
         <action
             android:id="@+id/start_loading_page"

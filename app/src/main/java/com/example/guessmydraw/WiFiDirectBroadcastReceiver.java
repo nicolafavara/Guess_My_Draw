@@ -31,11 +31,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private final WifiP2pManager.Channel channel;
     private final MainActivity activity;
 
-    //TODO trovare un modo per evitare di usare queste due stringhe
-    private final String firstFragmentClassName = FirstScreen.class.getSimpleName();
-    private final String gameClassName = GameLobby.class.getSimpleName();
-    private final String deviceListClassName = DeviceList.class.getSimpleName();
-
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel, MainActivity activity) {
 
         super();
@@ -61,8 +56,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             }
         }
         else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
-            // A change in the list of available peers occurred.
 
+            // A change in the list of available peers occurred.
             if (manager == null) return;
 
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -72,9 +67,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             Log.d(TAG, "Intent WIFI_P2P_PEERS_CHANGED_ACTION received.");
 
             Fragment frag = activity.getForegroundFragment();
-
-            //TODO TROVARE UN MODO PIU' "PULITO" PER FARLO
-            if(frag != null && frag.toString().startsWith(deviceListClassName)){
+            if(frag instanceof DeviceList){
 
                 Log.d(TAG, "requesting peers...");
                 WifiP2pManager.PeerListListener listener = (WifiP2pManager.PeerListListener) frag;
@@ -97,12 +90,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 activity.isWifiP2pConnected = true;
 
                 Fragment frag = activity.getForegroundFragment();
-                if(frag != null && frag.toString().startsWith(Loading.class.getSimpleName())){
+                if(frag instanceof Loading){
                     Log.d(TAG, "Current fragment is Loading: requesting connection info...");
                     WifiP2pManager.ConnectionInfoListener listener = (WifiP2pManager.ConnectionInfoListener) frag;
                     manager.requestConnectionInfo(channel, listener);
                 }
-                else if(frag != null && frag.toString().startsWith(deviceListClassName)){
+                else if(frag instanceof DeviceList){
                     Log.d(TAG, "Current fragment is device list: starting loading page...");
                     Navigation.findNavController(activity, R.id.my_nav_host_fragment).navigate(R.id.start_loading_page);
                 }

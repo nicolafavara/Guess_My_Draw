@@ -27,10 +27,10 @@ public class ActivityViewModel extends AndroidViewModel {
 
     public void initSenders(String address){
         Log.d(TAG, "SENDERS INITIALIZED.");
-        mainSender = new Sender(address);
-        mainSender.start();
-        mainSenderInLoop = new SenderInLoop(address);
-        mainSenderInLoop.start();
+//        mainSender = new Sender(address);
+//        mainSender.start();
+//        mainSenderInLoop = new SenderInLoop(address);
+//        mainSenderInLoop.start();
     }
 
     public void sendMessage(Bundle bundle){

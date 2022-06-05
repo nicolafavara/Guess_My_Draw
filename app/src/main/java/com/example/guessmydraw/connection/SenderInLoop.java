@@ -13,10 +13,6 @@ public class SenderInLoop extends Sender {
     public final static String TAG = "SenderInLoop";
     public boolean stopLoop;
 
-    public SenderInLoop(@NonNull String destName) {
-        super(destName);
-    }
-
     @Override
     protected final void sendPacket(Parcelable msg) {
 

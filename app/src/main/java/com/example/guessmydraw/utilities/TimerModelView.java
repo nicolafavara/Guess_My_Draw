@@ -13,11 +13,9 @@ public class TimerModelView extends ViewModel {
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private CountDownTimer countDownTimer;
-    private MutableLiveData<Long> timerLiveData;
+    private final MutableLiveData<Long> timerLiveData = new MutableLiveData<>(60000L);
 
-    public TimerModelView() {
-        this.timerLiveData = new MutableLiveData<>(60000L);
-    }
+    public TimerModelView() {}
 
     public LiveData<Long> getTimerLiveData() {
         return timerLiveData;

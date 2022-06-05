@@ -94,11 +94,7 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
         chooseWordButton.setVisibility(View.INVISIBLE);
         chooseWordButton.setOnClickListener(view -> {
 
-            // TODO: FARE IN QUESTO MODO ANCHE IN ALTRI CASI
-            NavDestination dest = NavHostFragment.findNavController(this).getCurrentDestination();
-            if (dest == null) return;
-
-            String fragmentLabel = Objects.requireNonNull(dest.getLabel()).toString();
+            String fragmentLabel = activity.getForegroundFragmentLabel();
             if (fragmentLabel.equals(requireContext().getString(R.string.game_lobby_label))){
                 NavHostFragment.findNavController(this).navigate(R.id.start_word_list);
             }
@@ -127,6 +123,7 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     @Override
     public void onResume() {
         super.onResume();
+        //TODO NECESSATIO?
         activity = (MainActivity) requireActivity();
         // Hide status bar
         View windowDecorView = activity.getWindow().getDecorView();
@@ -234,11 +231,18 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     @Override
     public void onAckMessageReceived() {
 
-        gameViewModel.setAckMessageFlag(true);
-        activity.stopSenderInLoop();
-        mainHandler.post(()-> {
-            playButton.setEnabled(true);
-        });
+        //TODO gameViewModel può essere null se il metodo viene chiamato non appena si accede a questo fragment
+        if(gameViewModel != null){
+
+            gameViewModel.setAckMessageFlag(true);
+            activity.stopSenderInLoop();
+            mainHandler.post(()-> {
+                playButton.setEnabled(true);
+            });
+        }
+        else{
+            Log.e(LOG_STRING_GAME_LOBBY, "GameViewModel is NULL");
+        }
     }
 
     @Override
@@ -248,6 +252,7 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
 
     @Override
     public void onEndingMessageReceived() {
+        //TODO CHECK
         //this message can be received here if the other player is still in the partial result fragment
         //and click on the End match button
         int n = gameViewModel.askToEndGame();

@@ -36,6 +36,9 @@ import com.example.guessmydraw.fragments.FirstScreen;
 import com.example.guessmydraw.fragments.Loading;
 import com.example.guessmydraw.utilities.ActivityViewModel;
 import com.example.guessmydraw.utilities.GameViewModel;
+import com.google.android.material.snackbar.Snackbar;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
 import java.util.Objects;
@@ -56,7 +59,10 @@ public class MainActivity extends AppCompatActivity
     private BroadcastReceiver broadcastReceiver = null;
 
     private GameViewModel gameViewModel;
-    private ActivityViewModel activityViewModel;
+
+    private static final Receiver receiver = new Receiver();
+    private static final Sender mainSender = new Sender();
+    private static final SenderInLoop mainSenderInLoop = new SenderInLoop();
 
     // Register the permissions callback, which handles the user's response to the
     // system permissions dialog. Save the return value, an instance of
@@ -94,7 +100,10 @@ public class MainActivity extends AppCompatActivity
         channel = manager.initialize(this, getMainLooper(), null);
 
         gameViewModel = new ViewModelProvider(this).get(GameViewModel.class);
-        activityViewModel = new ViewModelProvider(this).get(ActivityViewModel.class);
+
+        if (!receiver.isAlive()){
+            receiver.start();
+        }
     }
 
     /**
@@ -172,7 +181,6 @@ public class MainActivity extends AppCompatActivity
         //Check if user is already connected with someone
         if (isWifiP2pConnected){
             Toast.makeText(this, R.string.p2p_already_connected, Toast.LENGTH_LONG).show();
-            //TODO rimuovere disconnect(?)
             disconnect();
         }
 
@@ -210,10 +218,8 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess() {
-                NavDestination dest = Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).getCurrentDestination();
-                if (dest == null) return;
 
-                String fragmentLabel = Objects.requireNonNull(dest.getLabel()).toString();
+                String fragmentLabel = getForegroundFragmentLabel();
                 if (fragmentLabel.equals(getResources().getString(R.string.first_screen_label))){
                     Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.show_device_list);
                 }
@@ -246,8 +252,10 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess() {
-                //TODO assicurarsi ci si trovi nel fragment giusto prima
-                Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.start_loading_page);
+                String fragmentLabel = getForegroundFragmentLabel();
+                if (!fragmentLabel.equals(getResources().getString(R.string.device_list_label))) {
+                    Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.start_loading_page);
+                }
             }
 
             @Override
@@ -269,13 +277,10 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess() {
+
                 Log.d(TAG, "Disconnected.");
 
-                NavDestination dest = Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).getCurrentDestination();
-                if (dest == null) return;
-
-                String fragmentLabel = Objects.requireNonNull(dest.getLabel()).toString();
-                Log.d(TAG, "FragmentLabel: " + fragmentLabel);
+                String fragmentLabel = getForegroundFragmentLabel();
                 if (!fragmentLabel.equals(getResources().getString(R.string.match_results_label))){
                     Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.disconnection);
                 }
@@ -301,25 +306,39 @@ public class MainActivity extends AppCompatActivity
         return null;
     }
 
-    public void registerForReceiver(@NonNull NetworkEventCallback callback){
-        activityViewModel.registerForReceiver(callback);
+    public String getForegroundFragmentLabel(){
+        NavDestination dest = Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).getCurrentDestination();
+        if (dest == null) return null;
+
+        return Objects.requireNonNull(dest.getLabel()).toString();
     }
 
-    public void initSenders(String address){
-        activityViewModel.initSenders(address);
+    public void registerForReceiver(@NonNull NetworkEventCallback callback){
+        receiver.setNetworkEventCallback(callback);
+    }
+
+    public void initSenders(@NotNull String address){
+
+        Log.d(TAG, "SENDERS INITIALIZED.");
+        mainSender.setDestName(address);
+        if (!mainSender.isAlive()){
+            mainSender.start();
+        }
+        mainSenderInLoop.setDestName(address);
+        if(!mainSenderInLoop.isAlive()){
+            mainSenderInLoop.start();
+        }
     }
 
     public void sendMessage(Bundle bundle){
-        activityViewModel.sendMessage(bundle);
+        mainSender.sendMessage(bundle);
     }
 
     public void sendMessageInLoop(Bundle bundle){
-        activityViewModel.sendMessageInLoop(bundle);
+        mainSenderInLoop.sendMessage(bundle);
     }
 
     public void stopSenderInLoop(){
-        //TODO NullPointerException
-        activityViewModel.stopSenderInLoop();
+        mainSenderInLoop.stopLoop();
     }
-
 }
