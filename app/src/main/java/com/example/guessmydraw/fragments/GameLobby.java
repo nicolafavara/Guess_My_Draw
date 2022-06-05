@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDestination;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -34,14 +34,12 @@ import com.example.guessmydraw.utilities.DisconnectionDialog;
 import com.example.guessmydraw.utilities.GameViewModel;
 
 import java.net.InetAddress;
-import java.util.Objects;
 
 public class GameLobby extends Fragment implements NetworkEventCallback {
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private final String LOG_STRING_GAME_LOBBY = "GAME_LOBBY";
+    private final String TAG = "GAME_LOBBY";
     private FragmentGameLobbyBinding binding;
-    private MainActivity activity;
 
     private Button playButton;
     private Button chooseWordButton;
@@ -58,10 +56,6 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d("DEBUG", "GAMEEEEEEE LOBBYYYYYYYYYYYY");
-
-        activity = (MainActivity) requireActivity();
-
         // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
@@ -70,16 +64,15 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
                 new DisconnectionDialog().show(getChildFragmentManager(), DisconnectionDialog.TAG);
             }
         };
-        activity.getOnBackPressedDispatcher().addCallback(this, callback);
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
         // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
         //register for callback to the activity receiver
-        activity.registerForReceiver(this);
+        ((MainActivity)requireActivity()).registerForReceiver(this);
 
         // Inflate the layout for this fragment
         binding = FragmentGameLobbyBinding.inflate(inflater, container, false);
@@ -93,24 +86,17 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
         chooseWordButton.setEnabled(true);
         chooseWordButton.setVisibility(View.INVISIBLE);
         chooseWordButton.setOnClickListener(view -> {
-
-            String fragmentLabel = activity.getForegroundFragmentLabel();
-            if (fragmentLabel.equals(requireContext().getString(R.string.game_lobby_label))){
-                NavHostFragment.findNavController(this).navigate(R.id.start_word_list);
-            }
+            NavHostFragment.findNavController(this).navigate(R.id.start_word_list);
         });
 
         playButton = binding.playButton;
         playButton.setEnabled(false);
         playButton.setOnClickListener(view -> {
 
-            Log.d(LOG_STRING_GAME_LOBBY, "isMyTurnToDraw " +  gameViewModel.getMyTurnToDraw() + ". ");
+            Log.d(TAG, "isMyTurnToDraw " +  gameViewModel.getMyTurnToDraw() + ". ");
             if (gameViewModel.getMyTurnToDraw()){
                 if (chosenWord != null){
                     NavHostFragment.findNavController(this).navigate(R.id.start_current_player_games);
-                }
-                else{
-                    Toast.makeText(requireActivity(), "Prima di iniziare, scegli una parola da disegnare", Toast.LENGTH_LONG).show();
                 }
             }
             else{
@@ -123,10 +109,8 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     @Override
     public void onResume() {
         super.onResume();
-        //TODO NECESSATIO?
-        activity = (MainActivity) requireActivity();
         // Hide status bar
-        View windowDecorView = activity.getWindow().getDecorView();
+        View windowDecorView = requireActivity().getWindow().getDecorView();
         windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
@@ -134,13 +118,13 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        gameViewModel = new ViewModelProvider(activity).get(GameViewModel.class);
+        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
 
-        chosenWord = Navigation.findNavController(activity, R.id.my_nav_host_fragment)
-                                .getCurrentBackStackEntry().getSavedStateHandle().getLiveData("chosenWord");
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.my_nav_host_fragment);
+        chosenWord = navController.getCurrentBackStackEntry().getSavedStateHandle().getLiveData("chosenWord");
         chosenWord.observe(getViewLifecycleOwner(), word -> {
 
-            Log.d(LOG_STRING_GAME_LOBBY, "chosenWord changed: " + word + "(" + chosenWord.getValue() + ")");
+            Log.d(TAG, "chosenWord changed: " + word + "(" + chosenWord.getValue() + ")");
             sendAnswer(word);
 
             gameViewModel.setChoosenWord(word);
@@ -150,7 +134,8 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
             });
         });
 
-        Log.d(LOG_STRING_GAME_LOBBY, gameViewModel.toString());
+        Log.d(TAG, gameViewModel.toString());
+
         determCurrent();
         if (gameViewModel.isAckMessageFlag()){
             playButton.setEnabled(true);
@@ -160,7 +145,7 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     private void determCurrent(){
 
         int currRound = gameViewModel.getRoundNumber();
-        Log.d(LOG_STRING_GAME_LOBBY, "Current round is " + currRound);
+        Log.d(TAG, "Current round is " + currRound);
 
         if(gameViewModel.getGroupOwnerFlag()){
             if(currRound % 2 == 0){
@@ -181,14 +166,14 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     }
 
     private void setDrawerUI(){
-        Log.d(LOG_STRING_GAME_LOBBY, "Time to Draw!");
-        roleTextView.setText(R.string.draw);
+        Log.d(TAG, "Time to Draw!");
+        roleTextView.setText(R.string.draw_role);
         chooseWordButton.setVisibility(View.VISIBLE);
         gameViewModel.setMyTurnToDraw(true);
     }
 
     private void setGuesserUI(){
-        Log.d(LOG_STRING_GAME_LOBBY, "Time to Guess!");
+        Log.d(TAG, "Time to Guess!");
         roleTextView.setText(R.string.guess);
         gameViewModel.setMyTurnToDraw(false);
     }
@@ -198,28 +183,29 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
      */
     private void sendAnswer(@NonNull String answer) {
 
-        Log.d(LOG_STRING_GAME_LOBBY, "sending answer(" + answer + ") to other player.");
+        Log.d(TAG, "sending answer(" + answer + ") to other player.");
         AnswerMessage messageToSend = new AnswerMessage();
         messageToSend.setAnswer(answer);
         Bundle bundle = new Bundle();
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
-        activity.sendMessageInLoop(bundle);
+        ((MainActivity)requireActivity()).sendMessageInLoop(bundle);
     }
 
     private void sendAck(){
         AckMessage messageToSend = new AckMessage();
         Bundle bundle = new Bundle();
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
-        activity.sendMessage(bundle);
+        ((MainActivity)requireActivity()).sendMessage(bundle);
     }
 
     @Override
     public void onAnswerMessageReceived(String answer) {
 
         sendAck();
+        //TODO gameViewModel può essere null se il messaggio arriva "quando il fragment sta diventando visibile"
         gameViewModel.setAckMessageFlag(true);
 
-        Log.d(LOG_STRING_GAME_LOBBY, "answer received (" + answer + ").");
+        Log.d(TAG, "answer received (" + answer + ").");
         gameViewModel.setChoosenWord(answer);
         mainHandler.post(()->{
             // enable button to choose word only after the current player has obtained
@@ -235,13 +221,13 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
         if(gameViewModel != null){
 
             gameViewModel.setAckMessageFlag(true);
-            activity.stopSenderInLoop();
+            ((MainActivity)requireActivity()).stopSenderInLoop();
             mainHandler.post(()-> {
                 playButton.setEnabled(true);
             });
         }
         else{
-            Log.e(LOG_STRING_GAME_LOBBY, "GameViewModel is NULL");
+            Log.e(TAG, "GameViewModel is NULL");
         }
     }
 
@@ -258,7 +244,7 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
         int n = gameViewModel.askToEndGame();
         if (n == 2){
             mainHandler.post(() -> {
-                Toast.makeText(activity, "Numero di richieste per terminare la partita raggiunte.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireActivity(), R.string.end_match_request_reached, Toast.LENGTH_SHORT).show();
                 NavHostFragment.findNavController(this).navigate(R.id.end_match);
             });
         }

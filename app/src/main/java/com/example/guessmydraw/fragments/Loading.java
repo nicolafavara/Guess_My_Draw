@@ -38,7 +38,6 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final static String TAG = "LOADING_FRAGMENT";
     private FragmentLoadingBinding binding;
-    private MainActivity activity;
 
     private boolean groupOwnerFlag = false;
     private GameViewModel gameViewModel;
@@ -49,8 +48,6 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        activity = (MainActivity) requireActivity();
-
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -58,7 +55,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
                 new DisconnectionDialog().show(getChildFragmentManager(), DisconnectionDialog.TAG);
             }
         };
-        activity.getOnBackPressedDispatcher().addCallback(this, callback);
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override
@@ -66,7 +63,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
                              Bundle savedInstanceState) {
 
         //register for callback to the activity receiver
-        activity.registerForReceiver(this);
+        ((MainActivity)requireActivity()).registerForReceiver(this);
 
         // Inflate the layout for this fragment
         binding = FragmentLoadingBinding.inflate(inflater, container, false);
@@ -78,15 +75,14 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
         super.onViewCreated(view, savedInstanceState);
         gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
         gameViewModel.init();
-        activity.askForConnectionInfo(this);
+        ((MainActivity)requireActivity()).askForConnectionInfo(this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        activity = (MainActivity) requireActivity();
         // Hide status bar
-        View windowDecorView = activity.getWindow().getDecorView();
+        View windowDecorView = requireActivity().getWindow().getDecorView();
         windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
@@ -112,7 +108,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
                 assert groupOwnerAddress != null;
                 gameViewModel.setOpponentAddress(groupOwnerAddress);
                 gameViewModel.setMyTurnToDraw(false);
-                activity.initSenders(groupOwnerAddress);
+                ((MainActivity)requireActivity()).initSenders(groupOwnerAddress);
                 //sends a packet to the group owner to let him know the IP address of the peer
                 sendHandshakeMessage(true);
             }
@@ -134,10 +130,10 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
         messageToSend.setPlayersName(name);
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
         if (inLoop){
-            activity.sendMessageInLoop(bundle);
+            ((MainActivity)requireActivity()).sendMessageInLoop(bundle);
         }
         else{
-            activity.sendMessage(bundle);
+            ((MainActivity)requireActivity()).sendMessage(bundle);
         }
     }
 
@@ -148,12 +144,12 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
         if (groupOwnerFlag){
             //we are the group owner, so we use the message received to save the peer's address
             gameViewModel.setOpponentAddress(Objects.requireNonNull(address.getHostAddress()));
-            activity.initSenders(address.getHostAddress());
+            ((MainActivity)requireActivity()).initSenders(address.getHostAddress());
             sendHandshakeMessage(false);
         }
         else{
             //peer has received the handshake message, it can stop sender
-            activity.stopSenderInLoop();
+            ((MainActivity)requireActivity()).stopSenderInLoop();
         }
 
         gameViewModel.setOpponentsName(opponentsName);

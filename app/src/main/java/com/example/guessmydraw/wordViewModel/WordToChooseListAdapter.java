@@ -4,6 +4,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
@@ -32,8 +33,9 @@ public class WordToChooseListAdapter extends ListAdapter<Word, WordViewHolder> {
 
         holder.itemView.setOnClickListener((itemView) -> {
 
-            NavHostFragment.findNavController(fragment).getPreviousBackStackEntry().getSavedStateHandle().set("chosenWord", current.getWord());
-            NavHostFragment.findNavController(fragment).popBackStack();
+            NavController navController = NavHostFragment.findNavController(fragment);
+            navController.getPreviousBackStackEntry().getSavedStateHandle().set("chosenWord", current.getWord());
+            navController.popBackStack();
         });
     }
 

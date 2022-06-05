@@ -12,6 +12,9 @@ import androidx.fragment.app.FragmentActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.fragments.DeviceList;
 
+/**
+ * Disconnectio dialog to be showed during a match when player press back button
+ */
 public class DisconnectionDialog extends DialogFragment {
 
     public static String TAG = "DisconnectionDialog";
@@ -24,16 +27,10 @@ public class DisconnectionDialog extends DialogFragment {
                 .setNegativeButton(getString(R.string.cancel), null)
                 .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
 
-                    FragmentActivity activity = getActivity();
-                    if (activity != null){
-                        DeviceList.DeviceActionListener listener = (DeviceList.DeviceActionListener) activity;
-                        listener.disconnect();
-                    }
-                    else {
-                        Log.d("DEBUG", "getActivity is null. Disconnection failed.");
-                    }
+                    FragmentActivity activity = requireActivity();
+                    DeviceList.DeviceActionListener listener = (DeviceList.DeviceActionListener) activity;
+                    listener.disconnect();
 
-                } )
-                .create();
+                }).create();
     }
 }

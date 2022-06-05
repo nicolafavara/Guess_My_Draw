@@ -3,6 +3,9 @@ package com.example.guessmydraw.connection.messages;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Message used to inform the opponent that timer expired
+ */
 public class TimerExpiredMessage implements Parcelable {
 
     public static byte NET_ID = 4;

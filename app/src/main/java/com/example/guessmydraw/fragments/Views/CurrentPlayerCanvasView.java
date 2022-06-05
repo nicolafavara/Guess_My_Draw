@@ -9,7 +9,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.widget.Toast;
 
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
@@ -22,17 +21,16 @@ import com.example.guessmydraw.utilities.GameViewModel;
 
 public class CurrentPlayerCanvasView extends View {
 
-    private GameViewModel gameViewModel;
+    //viewModel used to save all the information needed for the match
+    private final GameViewModel gameViewModel;
+
+    private final int touchTolerance;
     private Canvas extraCanvas;
     private Bitmap extraBitmap;
-
-    private final int backgroundColor;
-    private final int paintColor;
-    private final int touchTolerance;
-
     private final Path path;
     private final Paint paint;
 
+    /*attributes to store screen coordinates used for drawing*/
     private float motionTouchEventX;
     private float motionTouchEventY;
     private float currentX;
@@ -41,13 +39,12 @@ public class CurrentPlayerCanvasView extends View {
     public CurrentPlayerCanvasView(Context context, AttributeSet attrs) {
 
         super(context, attrs);
-        backgroundColor = ResourcesCompat.getColor(this.getResources(), R.color.colorCanvas, null);
         touchTolerance = ViewConfiguration.get(context).getScaledTouchSlop();
 
         gameViewModel = new ViewModelProvider(((MainActivity) getContext())).get(GameViewModel.class);
 
         //set the color we will use to paint
-        paintColor = ResourcesCompat.getColor(this.getResources(), R.color.colorPaint, null);
+        int paintColor = ResourcesCompat.getColor(this.getResources(), R.color.colorPaint, null);
 
         path = new Path();
 
@@ -70,7 +67,6 @@ public class CurrentPlayerCanvasView extends View {
         }
 
         extraBitmap = Bitmap.createBitmap(w, w, Bitmap.Config.ARGB_8888);
-        // extraBitmap.eraseColor(backgroundColor);
         extraCanvas = new Canvas();
 
         if (gameViewModel.getBitmap() != null){
@@ -83,13 +79,13 @@ public class CurrentPlayerCanvasView extends View {
     @Override
     protected void onDraw(Canvas canvas) { //this canvas is not our this.extraCanvas
         super.onDraw(canvas);
-//        canvas.drawBitmap(extraBitmap, 0f, 0f, null);
         canvas.drawBitmap(extraBitmap, 0f, 0f, paint);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        //we save the current bitmap to restore it when the view is recreated
         gameViewModel.setBitmap(extraBitmap);
     }
 
@@ -150,24 +146,26 @@ public class CurrentPlayerCanvasView extends View {
         this.path.reset();
     }
 
-    /*method to send message*/
+    /*method to send messages to the opponent*/
 
     private void sendTouchStartMessage(float motionTouchEventX, float motionTouchEventY){
 
         Fragment frag = ((MainActivity) getContext()).getForegroundFragment();
-        if(frag != null && frag.toString().startsWith(CanvasCurrentPlayer.class.getSimpleName())){
+        if(frag instanceof CanvasCurrentPlayer){
 
+            //normalizing coordinates
             float xNorm = motionTouchEventX / extraCanvas.getWidth();
             float yNorm = motionTouchEventY / extraCanvas.getHeight();
 
-            ((CanvasCurrentPlayer)frag).sendMessageOverNetwork(xNorm, yNorm, -1, -1, MotionEvent.ACTION_DOWN, paint.getColor());
+            //fragment method to send message
+            ((CanvasCurrentPlayer)frag).sendDrawMessage(xNorm, yNorm, -1, -1, MotionEvent.ACTION_DOWN, paint.getColor());
         }
     }
 
     private void sendTouchMoveMessage(float currentX, float currentY, float x2, float y2){
 
         Fragment frag = ((MainActivity) getContext()).getForegroundFragment();
-        if(frag != null && frag.toString().startsWith(CanvasCurrentPlayer.class.getSimpleName())){
+        if(frag instanceof CanvasCurrentPlayer){
 
             //normalizing coordinates
             float xNorm = currentX / extraCanvas.getWidth();
@@ -175,16 +173,18 @@ public class CurrentPlayerCanvasView extends View {
             float x2Norm = x2 / extraCanvas.getWidth();
             float y2Norm = y2 / extraCanvas.getHeight();
 
-            ((CanvasCurrentPlayer)frag).sendMessageOverNetwork(xNorm, yNorm, x2Norm, y2Norm, MotionEvent.ACTION_MOVE, paint.getColor());
+            //fragment method to send message
+            ((CanvasCurrentPlayer)frag).sendDrawMessage(xNorm, yNorm, x2Norm, y2Norm, MotionEvent.ACTION_MOVE, paint.getColor());
         }
     }
 
     private void sendTouchUpMessage(){
 
         Fragment frag = ((MainActivity) getContext()).getForegroundFragment();
-        if(frag != null && frag.toString().startsWith(CanvasCurrentPlayer.class.getSimpleName())){
+        if(frag instanceof CanvasCurrentPlayer){
 
-            ((CanvasCurrentPlayer)frag).sendMessageOverNetwork(-1, -1, -1, -1, MotionEvent.ACTION_UP, paint.getColor());
+            //fragment method to send message
+            ((CanvasCurrentPlayer)frag).sendDrawMessage(-1, -1, -1, -1, MotionEvent.ACTION_UP, paint.getColor());
         }
     }
 }

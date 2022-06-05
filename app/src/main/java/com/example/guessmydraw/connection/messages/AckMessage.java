@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /***
- * Bla bla.
+ * Message to be sent by the player who has to guess to the opponent informing him that the answer has been received.
  */
 public class AckMessage implements Parcelable {
 

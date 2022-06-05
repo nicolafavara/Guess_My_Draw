@@ -45,9 +45,8 @@ public class NewWord extends Fragment {
         wordViewModel = new ViewModelProvider(this).get(WordViewModel.class);
 
 
-        button.setOnClickListener( view -> {
+        button.setOnClickListener(view -> {
             if (TextUtils.isEmpty(editText.getText())) {
-
                 Toast.makeText(requireContext(), R.string.empty_word_not_saved, Toast.LENGTH_LONG).show();
             }
             else {

@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.databinding.FragmentMatchResultsBinding;
-import com.example.guessmydraw.databinding.FragmentPartialResultsBinding;
 import com.example.guessmydraw.utilities.DisconnectionDialog;
 import com.example.guessmydraw.utilities.GameViewModel;
 
@@ -53,13 +52,13 @@ public class MatchResults extends Fragment {
         int score2 = gameViewModel.getScorePlayerTwo();
 
         if (score1 > score2){
-            textView.setText("Hai Vinto!!!");
+            textView.setText(R.string.you_win);
         }
         else if(score1 == score2){
-            textView.setText("Pareggio.");
+            textView.setText(R.string.draw_text);
         }
         else{
-            textView.setText("Peccato,\nhai perso :(");
+            textView.setText(R.string.defeat_text);
         }
 
         Button button = binding.returnToFirstScreenButton;

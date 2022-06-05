@@ -11,9 +11,11 @@ import androidx.lifecycle.ViewModel;
 
 public class TimerModelView extends ViewModel {
 
+    private final static String TAG = "TimerModelView";
+
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private CountDownTimer countDownTimer;
     private final MutableLiveData<Long> timerLiveData = new MutableLiveData<>(60000L);
+    private CountDownTimer countDownTimer;
 
     public TimerModelView() {}
 
@@ -28,12 +30,11 @@ public class TimerModelView extends ViewModel {
                 countDownTimer.cancel();
             }
 
-            Log.d("DEBUG", "starting timer.................................................");
+            Log.d(TAG, "starting timer...");
             countDownTimer = new CountDownTimer(60000, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     timerLiveData.setValue(millisUntilFinished);
-                    Log.d("TIMER", "tick: " + (millisUntilFinished/1000));
                 }
 
                 public void onFinish() {
@@ -47,7 +48,7 @@ public class TimerModelView extends ViewModel {
     public void cancelTimer(){
         mainHandler.post(() -> {
             if (countDownTimer != null) {
-                Log.d("DEBUG", "Cancelling timer.................................................");
+                Log.d(TAG, "Cancelling timer...");
                 countDownTimer.cancel();
             }
         });

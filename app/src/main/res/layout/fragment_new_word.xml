@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:minHeight="@dimen/min_height"
         android:fontFamily="sans-serif-light"
-        android:hint="@string/answer_hint"
+        android:hint="@string/word_hint"
         android:inputType="textAutoComplete"
         android:layout_margin="@dimen/margin"
         android:textSize="18sp" />

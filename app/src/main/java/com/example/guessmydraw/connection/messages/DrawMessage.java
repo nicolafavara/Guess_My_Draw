@@ -5,17 +5,18 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+/**
+ * message that contains the information necessary to have the current player's drawing reproduced on the opponent's display
+ */
 public class DrawMessage implements Parcelable {
 
     public static byte NET_ID = 1;
 
+    private int motionEventAction = -1;
     private float currentX = 0f;
     private float currentY = 0f;
     private float x2 = 0f;
     private float y2 = 0f;
-
-    private int motionEventAction = -1;
-
     private int paintColor;
 
     @NonNull
@@ -42,8 +43,7 @@ public class DrawMessage implements Parcelable {
                 '}';
     }
 
-    public DrawMessage() {
-    }
+    public DrawMessage() {}
 
     public DrawMessage(float currentX, float currentY, float x2, float y2, int motionEventAction, int paintColor) {
         this.currentX = currentX;

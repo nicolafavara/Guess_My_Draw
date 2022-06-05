@@ -29,20 +29,22 @@ import java.net.InetAddress;
 public class OtherPlayerCanvasView extends View implements NetworkEventCallback {
 
     private final static String TAG = "OTHER_CANVAS_VIEW";
+
+    //viewModel used to save all the information needed for the match
     private GameViewModel gameViewModel;
 
     private final Paint paint;
     private final Path path;
     private Canvas extraCanvas;
     private Bitmap extraBitmap;
-    private final int backgroundColor;
 
     public OtherPlayerCanvasView(Context context, AttributeSet attrs){
 
         super(context, attrs);
+
         setSaveEnabled(true);
-        this.backgroundColor = ResourcesCompat.getColor(this.getResources(), R.color.page_color, null);
         int drawColor = ResourcesCompat.getColor(this.getResources(), R.color.black, null);
+
         this.path = new Path();
         this.paint = new Paint();
         this.paint.setColor(drawColor);
@@ -52,7 +54,6 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
         this.paint.setStrokeJoin(Paint.Join.ROUND);
         this.paint.setStrokeCap(Paint.Cap.ROUND);
         this.paint.setStrokeWidth(12.0F);
-
     }
 
     @Override
@@ -77,9 +78,7 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
 
         if (gameViewModel.getBitmap() != null){
             extraBitmap = gameViewModel.getBitmap();
-            Toast.makeText((MainActivity)getContext(), "Copied", Toast.LENGTH_SHORT).show();
         }
-//        extraCanvas.drawColor(backgroundColor);
         extraCanvas.setBitmap(extraBitmap);
     }
 
@@ -93,6 +92,7 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        //we save the current bitmap to restore it when the view is recreated
         gameViewModel.setBitmap(extraBitmap);
     }
 
@@ -106,10 +106,12 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
             return;
         }
 
-        if (gameViewModel.getIsFirstMsg()){
-            Fragment frag = ((MainActivity) getContext()).getForegroundFragment();
-            if(frag != null && frag.toString().startsWith(CanvasOtherPlayer.class.getSimpleName())){
+        // if it is the first message we save this information in the viewModel to make sure we perform this operation only the first time
+        if (gameViewModel.getIsFirstMsg()){ //flag with "true" value each time a round starts
 
+            Fragment frag = ((MainActivity) getContext()).getForegroundFragment();
+            //we check that the current fragment is the correct one and call the method
+            if(frag instanceof CanvasOtherPlayer){
                 ((CanvasOtherPlayer)frag).firstDrawMessageReceived();
             }
             gameViewModel.setIsFirstMsg(false);
@@ -121,6 +123,7 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
 
             case MotionEvent.ACTION_DOWN:{
                     this.path.reset();
+                    //de-normalizing coordinates
                     float currentX = message.getCurrentX() * extraCanvas.getWidth();
                     float currentY = message.getCurrentY() * extraCanvas.getHeight();
                     this.path.moveTo(currentX, currentY);
@@ -147,6 +150,13 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
         }
     }
 
+    /**
+     * interface callback used to inform fragment that first draw message was received
+     */
+    public interface canvasViewCallback{
+        void firstDrawMessageReceived();
+    }
+
     @Override
     public void onAnswerMessageReceived(String answer) {/*EMPTY*/}
 
@@ -167,10 +177,5 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
 
     @Override
     public void onHandshakeMessageReceived(InetAddress address, String opponentsName) {/*EMPTY*/}
-
-    public interface canvasViewCallback{
-
-        void firstDrawMessageReceived();
-    }
 
 }

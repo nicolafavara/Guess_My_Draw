@@ -41,6 +41,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.DeviceViewHolder> 
 
     private final ArrayList<WifiP2pDevice> devices = new ArrayList<>();
     private final Context context;
+    private final static String TAG = "RVAdapter";
 
     public RVAdapter(Context context){
         this.context = context;
@@ -70,7 +71,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.DeviceViewHolder> 
             holder.itemView.setTag(device);
             holder.itemView.setOnClickListener((itemView) -> {
 
-                Toast.makeText(itemView.getContext(), "Connecting...", Toast.LENGTH_LONG).show();
+                Toast.makeText(itemView.getContext(), R.string.connecting, Toast.LENGTH_LONG).show();
 
                 WifiP2pConfig config = new WifiP2pConfig();
                 config.deviceAddress = device.deviceAddress;
@@ -81,7 +82,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.DeviceViewHolder> 
             });
         }
         else{
-            Log.d("DEBUG", "in onBindViewHolder: index is out of bound ! ! ! ");
+            Log.d(TAG, "in onBindViewHolder: index is out of bound ! ! ! ");
         }
     }
 

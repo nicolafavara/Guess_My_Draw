@@ -22,7 +22,7 @@ import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.NetworkEventCallback;
 import com.example.guessmydraw.connection.Sender;
 import com.example.guessmydraw.connection.messages.DrawMessage;
-import com.example.guessmydraw.connection.messages.EndingMessage;
+import com.example.guessmydraw.connection.messages.EndMatchRequestMessage;
 import com.example.guessmydraw.databinding.FragmentPartialResultsBinding;
 import com.example.guessmydraw.utilities.DisconnectionDialog;
 import com.example.guessmydraw.utilities.GameViewModel;
@@ -34,7 +34,6 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final static String TAG = "PARTIAL_RESULTS";
     private FragmentPartialResultsBinding binding;
-    private MainActivity activity;
 
     private GameViewModel gameViewModel;
     private Button endMatchButton;
@@ -45,8 +44,6 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        activity = (MainActivity) requireActivity();
-
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -54,14 +51,14 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
                 new DisconnectionDialog().show(getChildFragmentManager(), DisconnectionDialog.TAG);
             }
         };
-        activity.getOnBackPressedDispatcher().addCallback(this, callback);
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         //register for callback to the activity receiver
-        activity.registerForReceiver(this);
+        ((MainActivity)requireActivity()).registerForReceiver(this);
 
         // Inflate the layout for this fragment
         binding = FragmentPartialResultsBinding.inflate(inflater, container, false);
@@ -113,18 +110,17 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
     @Override
     public void onResume() {
         super.onResume();
-        activity = (MainActivity) requireActivity();
         // Hide status bar
-        View windowDecorView = activity.getWindow().getDecorView();
+        View windowDecorView = requireActivity().getWindow().getDecorView();
         windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
     private void sendEndingMessage() {
         Log.d(TAG, "sending end message to opponent.");
-        EndingMessage messageToSend = new EndingMessage();
+        EndMatchRequestMessage messageToSend = new EndMatchRequestMessage();
         Bundle bundle = new Bundle();
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
-        activity.sendMessage(bundle);
+        ((MainActivity)requireActivity()).sendMessage(bundle);
     }
 
     private void requestEndMatch(){
@@ -133,7 +129,7 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
         mainHandler.post(() -> {
             this.endMatchButton.setText(text);
             if(n == 2){
-                Toast.makeText(activity, "Numero di richieste per terminare la partita raggiunte.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireActivity(), R.string.end_match_request_reached, Toast.LENGTH_SHORT).show();
                 NavHostFragment.findNavController(this).navigate(R.id.end_match);
             }
         });

@@ -3,6 +3,9 @@ package com.example.guessmydraw.connection.messages;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Message that contains the current answer
+ */
 public class AnswerMessage implements Parcelable {
 
     public static byte NET_ID = 2;

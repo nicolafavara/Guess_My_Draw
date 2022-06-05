@@ -61,19 +61,19 @@ public class Sender extends Thread {
             }
         };
 
-        //handlerLock.lock();
+        handlerLock.lock();
             while (!enqueuedMessages.isEmpty()) {
                 Message msg = mHandler.obtainMessage();
                 msg.setData(enqueuedMessages.poll());
                 mHandler.sendMessage(msg);
             }
-        //handlerLock.unlock();
+        handlerLock.unlock();
 
         Looper.loop();
     }
 
     public void sendMessage(Bundle msgData) {
-        //handlerLock.lock();
+        handlerLock.lock();
             if (mHandler != null) {
                 Message msg = mHandler.obtainMessage();
                 msg.setData(msgData);
@@ -82,7 +82,7 @@ public class Sender extends Thread {
             else {
                 enqueuedMessages.add(msgData);
             }
-        //handlerLock.unlock();
+        handlerLock.unlock();
     }
 
     protected void sendPacket(Parcelable msg){

@@ -2,18 +2,16 @@ package com.example.guessmydraw.connection;
 
 import android.util.Log;
 
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 
 import com.example.guessmydraw.connection.messages.AckMessage;
 import com.example.guessmydraw.connection.messages.AnswerMessage;
 import com.example.guessmydraw.connection.messages.DrawMessage;
-import com.example.guessmydraw.connection.messages.EndingMessage;
+import com.example.guessmydraw.connection.messages.EndMatchRequestMessage;
 import com.example.guessmydraw.connection.messages.HandshakeMessage;
 import com.example.guessmydraw.connection.messages.StartDrawMessage;
 import com.example.guessmydraw.connection.messages.TimerExpiredMessage;
 import com.example.guessmydraw.connection.messages.WinMessage;
-import com.example.guessmydraw.fragments.GameLobby;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -49,7 +47,6 @@ public class Receiver extends Thread {
                 byte[] buffer = new byte[BUFF_SIZE];
                 DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
 
-                // rimane in attesa della risposta del server fino allo scadere del timeout
                 client.receive(receivedPacket);
 
                 byte[] bf = receivedPacket.getData();
@@ -83,8 +80,8 @@ public class Receiver extends Thread {
                     Log.d("DEBUG-Receiver", "packet TimerExpiredMessage received.");
                     callback.onTimerExpiredMessage();
                 }
-                else if (type == EndingMessage.NET_ID) {
-                    Log.d("DEBUG-Receiver", "packet EndingMessage received.");
+                else if (type == EndMatchRequestMessage.NET_ID) {
+                    Log.d("DEBUG-Receiver", "packet EndMatchRequestMessage received.");
                     callback.onEndingMessageReceived();
                 }
                 else if (type == AckMessage.NET_ID) {

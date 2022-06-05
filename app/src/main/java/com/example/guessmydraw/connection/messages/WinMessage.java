@@ -3,6 +3,9 @@ package com.example.guessmydraw.connection.messages;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Message used to inform the current player that the opponent has guessed correctly
+ */
 public class WinMessage implements Parcelable  {
 
     public static byte NET_ID = 3;

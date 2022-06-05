@@ -3,10 +3,12 @@ package com.example.guessmydraw.connection.messages;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Message used to inform the opponent that they can start drawing
+ */
 public class StartDrawMessage implements Parcelable {
 
     public static byte NET_ID = 7;
-
 
     @Override
     public int describeContents() {

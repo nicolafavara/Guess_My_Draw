@@ -1,5 +1,6 @@
  package com.example.guessmydraw.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -34,25 +35,27 @@ import com.example.guessmydraw.utilities.TimerModelView;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private FragmentCanvasOtherPlayerBinding binding;
-    private MainActivity activity;
 
     private TextView timerTextView;
     private String rightAnswer;
     private Bundle bundle;
 
+    //viewModel used to save all the information needed for the match
     private GameViewModel gameViewModel;
+    //TODO Scrivi commento
     private TimerModelView timerModelView;
 
-    public CanvasOtherPlayer() {
-        this.bundle = new Bundle();
-    }
+    public CanvasOtherPlayer() {}
 
+     @Override
+     public void onAttach(@NonNull Context context) {
+         super.onAttach(context);
+         this.bundle = new Bundle();
+     }
 
-    @Override
+     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        activity = (MainActivity) requireActivity();
 
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
@@ -61,7 +64,7 @@ import com.example.guessmydraw.utilities.TimerModelView;
                 new DisconnectionDialog().show(getChildFragmentManager(), DisconnectionDialog.TAG);
             }
         };
-        activity.getOnBackPressedDispatcher().addCallback(this, callback);
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override
@@ -84,7 +87,7 @@ import com.example.guessmydraw.utilities.TimerModelView;
                 sendTimerExpiredMessage();
 
                 mainHandler.post(() -> {
-                    Toast.makeText(getContext(), "FINE", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.Timer_expired, Toast.LENGTH_SHORT).show();
                 });
 
                 NavHostFragment.findNavController(this).navigate(R.id.end_round);
@@ -101,13 +104,13 @@ import com.example.guessmydraw.utilities.TimerModelView;
                     gameViewModel.updateScorePlayerOne();
                     sendWinMessage();
                     mainHandler.post(()->{
-                        Toast.makeText(getContext(), "Hai indovinato!!!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.you_guessed, Toast.LENGTH_SHORT).show();
                     });
                     NavHostFragment.findNavController(this).navigate(R.id.end_round);
                 }
                 else{
                     mainHandler.post(()->{
-                        Toast.makeText(getContext(), "Riprova", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.retry, Toast.LENGTH_SHORT).show();
                     });
                 }
             }
@@ -125,9 +128,8 @@ import com.example.guessmydraw.utilities.TimerModelView;
      @Override
      public void onResume() {
          super.onResume();
-         activity = (MainActivity) requireActivity();
          // Hide status bar
-         View windowDecorView = activity.getWindow().getDecorView();
+         View windowDecorView = requireActivity().getWindow().getDecorView();
          windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         //TODO MANDARE SOLO LA PRIMA VOLTA
          sendStartDrawMessage();
@@ -142,21 +144,21 @@ import com.example.guessmydraw.utilities.TimerModelView;
         WinMessage messageToSend = new WinMessage();
         bundle.clear();
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
-        activity.sendMessage(bundle);
+        ((MainActivity)requireActivity()).sendMessage(bundle);
     }
 
      private void sendStartDrawMessage() {
          StartDrawMessage messageToSend = new StartDrawMessage();
          bundle.clear();
          bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
-         activity.sendMessage(bundle);
+         ((MainActivity)requireActivity()).sendMessage(bundle);
      }
 
     private void sendTimerExpiredMessage(){
         TimerExpiredMessage messageToSend = new TimerExpiredMessage();
         bundle.clear();
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
-        activity.sendMessage(bundle);
+        ((MainActivity)requireActivity()).sendMessage(bundle);
     }
 
      @Override

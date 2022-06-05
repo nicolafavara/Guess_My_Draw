@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 
@@ -29,37 +28,30 @@ import com.example.guessmydraw.connection.NetworkEventCallback;
 import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.Sender;
 import com.example.guessmydraw.connection.SenderInLoop;
-import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.databinding.ActivityMainBinding;
 import com.example.guessmydraw.fragments.DeviceList;
 import com.example.guessmydraw.fragments.FirstScreen;
 import com.example.guessmydraw.fragments.Loading;
-import com.example.guessmydraw.utilities.ActivityViewModel;
-import com.example.guessmydraw.utilities.GameViewModel;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.net.InetAddress;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
         implements FirstScreen.FirstScreenListener, DeviceList.DeviceActionListener, Loading.GameCallback {
 
-    private static final String TAG = "DEBUG_MainActivity";
+    private static final String TAG = "MainActivity";
     private ActivityMainBinding binding;
 
+    //p2p wifi management attributes
     private final IntentFilter intentFilter = new IntentFilter();
-
+    private BroadcastReceiver broadcastReceiver = null;
     private WifiP2pManager.Channel channel;
     private WifiP2pManager manager;
     private boolean isWifiP2pEnabled = false;
     protected boolean isWifiP2pConnected = false;
-    private boolean isRefreshing = false;
-    private BroadcastReceiver broadcastReceiver = null;
 
-    private GameViewModel gameViewModel;
-
+    //TODO COMMENTA
     private static final Receiver receiver = new Receiver();
     private static final Sender mainSender = new Sender();
     private static final SenderInLoop mainSenderInLoop = new SenderInLoop();
@@ -92,19 +84,67 @@ public class MainActivity extends AppCompatActivity
         // Indicates this device's details have changed.
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
-        if (!initP2p()) {
+        if (!checkWifiP2pRequirements()) {
+            //TODO RIMUOVERE
             finish();
         }
 
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
 
-        gameViewModel = new ViewModelProvider(this).get(GameViewModel.class);
-
         if (!receiver.isAlive()){
-            receiver.start();
+            receiver.start();   //start the receiver thread 
         }
     }
+
+    /**
+     * register the BroadcastReceiver with the intent values to be matched
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        broadcastReceiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
+        registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    /**
+     * unregister the BroadcastReceiver
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        unregisterReceiver(broadcastReceiver);
+    }
+
+    /**
+     * Remove all peers and clear all fields. This is called on
+     * BroadcastReceiver receiving a state change event.
+     */
+    public void resetData() {
+        DeviceList deviceListFrag = (DeviceList) getSupportFragmentManager().findFragmentById(R.id.device_list);
+
+        if (deviceListFrag != null) {
+            deviceListFrag.clearPeers();
+        }
+    }
+
+    public Fragment getForegroundFragment(){
+
+        Fragment navHostFragment = getSupportFragmentManager().findFragmentById(R.id.my_nav_host_fragment);
+        if (navHostFragment != null) {
+            return navHostFragment.getChildFragmentManager().getFragments().get(0);
+        }
+        return null;
+    }
+
+    public String getForegroundFragmentLabel(){
+        NavDestination dest = Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).getCurrentDestination();
+        if (dest == null) return null;
+
+        return Objects.requireNonNull(dest.getLabel()).toString();
+    }
+
+    // Region WifiP2p methods
 
     /**
      * @param isWifiP2pEnabled the isWifiP2pEnabled to set
@@ -113,7 +153,7 @@ public class MainActivity extends AppCompatActivity
         this.isWifiP2pEnabled = isWifiP2pEnabled;
     }
 
-    private boolean initP2p() {
+    private boolean checkWifiP2pRequirements() {
         // Device capability definition check
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI_DIRECT)) {
             Log.e(TAG, "Wi-Fi Direct is not supported by this device.");
@@ -148,34 +188,6 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    /**
-     * register the BroadcastReceiver with the intent values to be matched
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
-        broadcastReceiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
-        registerReceiver(broadcastReceiver, intentFilter);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        unregisterReceiver(broadcastReceiver);
-    }
-
-    /**
-     * Remove all peers and clear all fields. This is called on
-     * BroadcastReceiver receiving a state change event.
-     */
-    public void resetData() {
-        DeviceList deviceListFrag = (DeviceList) getSupportFragmentManager().findFragmentById(R.id.device_list);
-
-        if (deviceListFrag != null) {
-            deviceListFrag.clearPeers();
-        }
-    }
-
     private boolean checkBeforeDiscovery(){
 
         //Check if user is already connected with someone
@@ -194,7 +206,7 @@ public class MainActivity extends AppCompatActivity
         LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         boolean gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if(!gps_enabled) {
-            Toast.makeText(MainActivity.this, "Per trovare un giocatore nei paraggi è necessario attivare il GPS.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, R.string.gps_required, Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -211,8 +223,8 @@ public class MainActivity extends AppCompatActivity
 
         if(!checkBeforeDiscovery()) return;
 
-        Toast.makeText(MainActivity.this, "Starting discovery...", Toast.LENGTH_SHORT).show();
-        Log.d("DEBUG", "Starting discovery...");
+        Toast.makeText(MainActivity.this, R.string.starting_discovery, Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Starting discovery...");
 
         manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
 
@@ -227,16 +239,14 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(int reasonCode) {
-                Toast.makeText(MainActivity.this, "Discovery Failed : " + reasonCode, Toast.LENGTH_SHORT).show();
-                Log.d("DEBUG", "Discovery Failed : " + reasonCode);
+                Toast.makeText(MainActivity.this, R.string.discovery_failed, Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Discovery Failed (" + reasonCode + ")");
             }
         });
     }
 
     @Override
     public void refresh(){
-
-        isRefreshing = true;
         //to refresh the device search, we call again the method to request again the discovery phase
         startDiscovery();
     }
@@ -260,7 +270,8 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(int reason) {
-                Toast.makeText(MainActivity.this, "Connect failed. Retry (Reason: (" + reason + ").", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, R.string.connection_failed, Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Connect failed. Retry (Reason: " + reason + ").");
             }
         });
     }
@@ -297,21 +308,9 @@ public class MainActivity extends AppCompatActivity
         manager.requestConnectionInfo(channel, listener);
     }
 
-    public Fragment getForegroundFragment(){
+    //end region
 
-        Fragment navHostFragment = getSupportFragmentManager().findFragmentById(R.id.my_nav_host_fragment);
-        if (navHostFragment != null) {
-            return navHostFragment.getChildFragmentManager().getFragments().get(0);
-        }
-        return null;
-    }
-
-    public String getForegroundFragmentLabel(){
-        NavDestination dest = Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).getCurrentDestination();
-        if (dest == null) return null;
-
-        return Objects.requireNonNull(dest.getLabel()).toString();
-    }
+    //region senders and receiver methods
 
     public void registerForReceiver(@NonNull NetworkEventCallback callback){
         receiver.setNetworkEventCallback(callback);

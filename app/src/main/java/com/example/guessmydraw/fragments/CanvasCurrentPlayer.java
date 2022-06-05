@@ -1,10 +1,10 @@
  package com.example.guessmydraw.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
@@ -21,7 +21,6 @@ import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.connection.NetworkEventCallback;
-import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.Sender;
 import com.example.guessmydraw.databinding.FragmentCanvasCurrentPlayerBinding;
 import com.example.guessmydraw.fragments.Views.CurrentPlayerCanvasView;
@@ -32,26 +31,26 @@ import java.net.InetAddress;
 
  public class CanvasCurrentPlayer extends Fragment implements NetworkEventCallback, View.OnClickListener {
 
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private FragmentCanvasCurrentPlayerBinding binding;
-    private MainActivity activity;
+     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+     private FragmentCanvasCurrentPlayerBinding binding;
 
-    private DrawMessage messageToSend;
-    private Bundle bundle;
+     //viewModel used to save all the information needed for the match
+     private GameViewModel gameViewModel;
 
-    private GameViewModel gameViewModel;
-    private CurrentPlayerCanvasView canvasView;
+     private CurrentPlayerCanvasView canvasView;
+     private DrawMessage messageToSend;
+     private Bundle bundle;
 
-    public CanvasCurrentPlayer() {
-        bundle = new Bundle();
-        messageToSend = new DrawMessage();
-    }
+     @Override
+     public void onAttach(@NonNull Context context) {
+         super.onAttach(context);
+         bundle = new Bundle();
+         messageToSend = new DrawMessage();
+     }
 
-    @Override
+     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        activity = (MainActivity) requireActivity();
 
         // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -61,7 +60,7 @@ import java.net.InetAddress;
                 new DisconnectionDialog().show(getChildFragmentManager(), DisconnectionDialog.TAG);
             }
         };
-        activity.getOnBackPressedDispatcher().addCallback(this, callback);
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
         // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
@@ -69,10 +68,12 @@ import java.net.InetAddress;
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         //register for callback to the activity receiver
-        activity.registerForReceiver(this);
+        ((MainActivity)requireActivity()).registerForReceiver(this);
 
         // Inflate the layout for this fragment
         binding = FragmentCanvasCurrentPlayerBinding.inflate(inflater, container, false);
+
+        //set listener for all buttons representing a color in the palette
         binding.buttonColorBlack.setOnClickListener(this);
         binding.buttonColorWhite.setOnClickListener(this);
         binding.buttonColorRed.setOnClickListener(this);
@@ -87,12 +88,15 @@ import java.net.InetAddress;
         binding.buttonColorViolet.setOnClickListener(this);
 
         gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
+        //we take from the viewModel the current word to draw and display it
         String wordToDraw = gameViewModel.getChoosenWord();
         binding.wordToDraw.setText(wordToDraw);
-        canvasView = binding.currentPlayerCanvasView;
 
+        canvasView = binding.currentPlayerCanvasView;
         // TODO SE IL GIOCATORE CORRENTE E' ANCORA NEL PARTIAL RESULT FRAGMENT...
         if(!gameViewModel.isStartDrawFlag()){
+            //if we are here the opponent is ready to receive draw message,
+            // so the current player can see the canvas and start draw
             canvasView.setVisibility(View.INVISIBLE);
         }
 
@@ -102,10 +106,9 @@ import java.net.InetAddress;
      @Override
      public void onResume() {
          super.onResume();
-         activity = (MainActivity) requireActivity();
      }
 
-     public void sendMessageOverNetwork(float currentX, float currentY, float x2, float y2, int motionEventAction, int paintColor) {
+     public void sendDrawMessage(float currentX, float currentY, float x2, float y2, int motionEventAction, int paintColor) {
 
         messageToSend.setCurrentX(currentX);
         messageToSend.setCurrentY(currentY);
@@ -117,7 +120,7 @@ import java.net.InetAddress;
         bundle.clear();
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
 
-        activity.sendMessage(bundle);
+        ((MainActivity)requireActivity()).sendMessage(bundle);
     }
 
      @Override
@@ -126,7 +129,7 @@ import java.net.InetAddress;
          gameViewModel.updateScorePlayerTwo();
 
          mainHandler.post(()->{
-             Toast.makeText(getContext(), "Il tuo avversario ha indovinato!", Toast.LENGTH_LONG).show();
+             Toast.makeText(requireActivity(), R.string.opponent_guessed, Toast.LENGTH_LONG).show();
              NavHostFragment.findNavController(this).navigate(R.id.end_round);
          });
      }
@@ -134,7 +137,7 @@ import java.net.InetAddress;
      @Override
      public void onTimerExpiredMessage() {
          mainHandler.post(()->{
-             Toast.makeText(getContext(), "Il tuo avversario ha perso!", Toast.LENGTH_LONG).show();
+             Toast.makeText(requireActivity(), R.string.opponent_did_not_guess, Toast.LENGTH_LONG).show();
              NavHostFragment.findNavController(this).navigate(R.id.end_round);
          });
      }

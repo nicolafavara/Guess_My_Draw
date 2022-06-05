@@ -4,6 +4,9 @@ import com.example.guessmydraw.connection.messages.DrawMessage;
 
 import java.net.InetAddress;
 
+/**
+ * Interface that contains all callback required to receive messages
+ */
 public interface NetworkEventCallback {
     void onHandshakeMessageReceived(InetAddress address, String opponentsName);
     void onDrawMessageReceived(DrawMessage msg);

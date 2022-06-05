@@ -3,6 +3,9 @@ package com.example.guessmydraw.connection.messages;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Message used to send one's nickname to the opponent
+ */
 public class HandshakeMessage implements Parcelable {
 
     public static byte NET_ID = 0;

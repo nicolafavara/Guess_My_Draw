@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.guessmydraw.MainActivity;
 import com.example.guessmydraw.R;
 import com.example.guessmydraw.databinding.FragmentFirstScreenBinding;
 import com.example.guessmydraw.utilities.GameViewModel;
@@ -45,6 +46,7 @@ public class FirstScreen extends Fragment {
                 GameViewModel gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
                 gameViewModel.setPlayersName(name);
 
+                //TODO NECESSARIO???
                 ((FirstScreenListener) requireActivity()).startDiscovery();
             }
             else{
@@ -54,10 +56,8 @@ public class FirstScreen extends Fragment {
 
         binding.showWordButton.setOnClickListener(view -> {
 
-            NavDestination dest = NavHostFragment.findNavController(this).getCurrentDestination();
-            if (dest == null) return;
-
-            String fragmentLabel = Objects.requireNonNull(dest.getLabel()).toString();
+            //TODO NECESSARIO?
+            String fragmentLabel = ((MainActivity) requireActivity()).getForegroundFragmentLabel();
             if (fragmentLabel.equals(requireContext().getString(R.string.first_screen_label))){
                 NavHostFragment.findNavController(this).navigate(R.id.show_word_list);
             }

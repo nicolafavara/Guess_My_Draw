@@ -23,8 +23,8 @@ public abstract class WordRoomDatabase extends RoomDatabase {
 
     public static WordRoomDatabase getDatabase(final Context context) {
 
-        //Qui implementa il pattern "singleton" per evitare
-        // che più di un istanza del DB sia aperta contemporaneamente
+        // Singleton pattern to prevent more than one instance
+        // of the DB from being open at the same time
         if (INSTANCE == null) {
             synchronized (WordRoomDatabase.class) {
                 if (INSTANCE == null) {
