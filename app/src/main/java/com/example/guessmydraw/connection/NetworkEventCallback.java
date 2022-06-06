@@ -11,7 +11,7 @@ public interface NetworkEventCallback {
     void onHandshakeMessageReceived(InetAddress address, String opponentsName);
     void onDrawMessageReceived(DrawMessage msg);
     void onAnswerMessageReceived(String answer);
-    void onWinMessageReceived();
+    void onWinMessageReceived(float remainingSeconds);
     void onTimerExpiredMessage();
     void onEndingMessageReceived();
     void onAckMessageReceived();

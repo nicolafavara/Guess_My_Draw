@@ -24,18 +24,19 @@
         app:layout_constraintVertical_bias="0.05" />
 
     <TextView
-        style="@style/Widget.AppCompat.TextView"
         android:id="@+id/score_player_one"
+        style="@style/Widget.AppCompat.TextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        tools:text="0"
         android:textAlignment="center"
-        android:textSize="120sp"
+        android:textSize="72dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/text"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4"
+        tools:text="0" />
 
     <TextView
         android:id="@+id/p1_name"
@@ -73,6 +74,7 @@
         android:text="-"
         android:textAlignment="center"
         android:textSize="48sp"
+        app:layout_constraintVertical_bias="0.4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -84,25 +86,55 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        tools:text="0"
         android:textAlignment="center"
-        android:textSize="128sp"
+        android:textSize="72dp"
+        app:layout_constraintVertical_bias="0.4"
+        tools:text="0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/text"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+    <TextView
+        android:id="@+id/bonus_text"
+        style="@style/Widget.AppCompat.TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="bonus"
+        android:textAlignment="center"
+        android:textSize="38sp"
+        app:layout_constraintVertical_bias="0.2"
+        app:layout_constraintBottom_toTopOf="@+id/return_to_lobby_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text" />
+
+    <TextView
+        android:id="@+id/bonus"
+        style="@style/Widget.AppCompat.TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textSize="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bonus_text"
+        tools:text="0" />
+
     <Button
-        style="@style/button"
         android:id="@+id/return_to_lobby_button"
+        style="@style/button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/return_to_lobby"
-        app:layout_constraintVertical_bias="0.95"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/end_match_button"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/end_match_button"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.95" />
 
     <Button
         style="@style/button"

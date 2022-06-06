@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,13 +21,9 @@ import com.example.guessmydraw.R;
 import com.example.guessmydraw.connection.NetworkEventCallback;
 import com.example.guessmydraw.connection.messages.DrawMessage;
 import com.example.guessmydraw.databinding.FragmentChooseWordBinding;
-import com.example.guessmydraw.databinding.FragmentGameLobbyBinding;
-import com.example.guessmydraw.databinding.FragmentWordListBinding;
 import com.example.guessmydraw.utilities.GameViewModel;
-import com.example.guessmydraw.wordViewModel.WordListAdapter;
 import com.example.guessmydraw.wordViewModel.WordToChooseListAdapter;
 import com.example.guessmydraw.wordViewModel.WordViewModel;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.net.InetAddress;
 
@@ -103,7 +98,7 @@ public class ChooseWord extends Fragment implements NetworkEventCallback {
     public void onAnswerMessageReceived(String answer) {/*EMPTY*/}
 
     @Override
-    public void onWinMessageReceived() {/*EMPTY*/}
+    public void onWinMessageReceived(float remainingSeconds) {/*EMPTY*/}
 
     @Override
     public void onTimerExpiredMessage() {/*EMPTY*/}

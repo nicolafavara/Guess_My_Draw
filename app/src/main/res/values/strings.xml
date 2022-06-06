@@ -61,4 +61,5 @@
     <string name="end_match_request_reached">Numero di richieste per terminare la partita raggiunte.</string>
     <string name="connecting">Connessione in corso…</string>
     <string name="connection_failed">Connessione fallita, riprova.</string>
+    <string name="missing_requirements">il dispositivo non supporta tutti i requisiti necessari.</string>
 </resources>

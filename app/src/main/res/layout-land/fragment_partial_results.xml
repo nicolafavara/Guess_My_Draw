@@ -15,8 +15,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textAlignment="center"
-        android:textSize="120sp"
-        app:layout_constraintVertical_bias="0.7"
+        android:textSize="72dp"
+        app:layout_constraintVertical_bias="0.5"
         tools:text="0"
         app:layout_constraintEnd_toStartOf="@+id/text"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,7 +59,7 @@
         android:text="-"
         android:textAlignment="center"
         android:textSize="48sp"
-        app:layout_constraintVertical_bias="0.7"
+        app:layout_constraintVertical_bias="0.5"
         app:layout_constraintBottom_toTopOf="@id/return_to_lobby_button"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -72,14 +72,45 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textAlignment="center"
-        android:textSize="128sp"
-        app:layout_constraintVertical_bias="0.7"
+        android:textSize="72dp"
+        app:layout_constraintVertical_bias="0.5"
         app:layout_constraintBottom_toTopOf="@id/return_to_lobby_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/text"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="0" />
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/return_to_lobby_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text">
+
+
+        <TextView
+            android:id="@+id/bonus_text"
+            style="@style/Widget.AppCompat.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/small_margin"
+            android:text="bonus: "
+            android:textAlignment="center"
+            android:textSize="38sp" />
+
+        <TextView
+            android:id="@+id/bonus"
+            style="@style/Widget.AppCompat.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/small_margin"
+            android:gravity="center"
+            android:textSize="38dp"
+            tools:text="0" />
+
+    </LinearLayout>
 
     <Button
         style="@style/button"

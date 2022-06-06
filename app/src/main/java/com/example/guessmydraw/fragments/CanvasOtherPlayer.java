@@ -28,7 +28,7 @@ import com.example.guessmydraw.databinding.FragmentCanvasOtherPlayerBinding;
 import com.example.guessmydraw.fragments.Views.OtherPlayerCanvasView;
 import com.example.guessmydraw.utilities.DisconnectionDialog;
 import com.example.guessmydraw.utilities.GameViewModel;
-import com.example.guessmydraw.utilities.TimerModelView;
+import com.example.guessmydraw.utilities.TimerViewModel;
 
  public class CanvasOtherPlayer extends Fragment implements OtherPlayerCanvasView.canvasViewCallback{
 
@@ -44,7 +44,7 @@ import com.example.guessmydraw.utilities.TimerModelView;
     private GameViewModel gameViewModel;
     // viewModel used to store the information of the timer that
     // is in charge of counting down during a round
-    private TimerModelView timerModelView;
+    private TimerViewModel timerViewModel;
 
     public CanvasOtherPlayer() {}
 
@@ -78,8 +78,8 @@ import com.example.guessmydraw.utilities.TimerModelView;
         binding = FragmentCanvasOtherPlayerBinding.inflate(inflater, container, false);
         timerTextView = binding.timerTextView;
 
-        timerModelView = new ViewModelProvider(requireActivity()).get(TimerModelView.class);
-        timerModelView.getTimerLiveData().observe(getViewLifecycleOwner(), timeLeft -> {
+        timerViewModel = new ViewModelProvider(requireActivity()).get(TimerViewModel.class);
+        timerViewModel.getTimerLiveData().observe(getViewLifecycleOwner(), timeLeft -> {
 
             int timeLeftInSec = (int) (timeLeft / 1000);
             timerTextView.setText(String.valueOf(timeLeftInSec));
@@ -101,9 +101,10 @@ import com.example.guessmydraw.utilities.TimerModelView;
 
                 if(this.rightAnswer.equalsIgnoreCase(answer)){
 
-                    timerModelView.cancelTimer();
-                    gameViewModel.updateScorePlayerOne();
-                    sendWinMessage();
+                    float remainingSeconds = Integer.parseInt(timerTextView.getText().toString());
+                    timerViewModel.cancelTimer();
+                    gameViewModel.updateScorePlayerOne(remainingSeconds);
+                    sendWinMessage(remainingSeconds);
                     mainHandler.post(()->{
                         Toast.makeText(getContext(), R.string.you_guessed, Toast.LENGTH_SHORT).show();
                     });
@@ -134,8 +135,9 @@ import com.example.guessmydraw.utilities.TimerModelView;
          }
      }
 
-    private void sendWinMessage() {
+    private void sendWinMessage(float remainingSeconds) {
         WinMessage messageToSend = new WinMessage();
+        messageToSend.setRemainingSeconds(remainingSeconds);
         bundle.clear();
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
         Log.d(TAG, "Sending win message");
@@ -158,7 +160,7 @@ import com.example.guessmydraw.utilities.TimerModelView;
 
      @Override
      public void firstDrawMessageReceived() {
-         timerModelView.requestTimer();
+         timerViewModel.requestTimer();
      }
 
  }

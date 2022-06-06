@@ -9,6 +9,7 @@ import android.os.Parcelable;
 public class WinMessage implements Parcelable  {
 
     public static byte NET_ID = 3;
+    private float remainingSeconds;
 
     @Override
     public int describeContents() {
@@ -17,16 +18,30 @@ public class WinMessage implements Parcelable  {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+
         dest.writeByte(NET_ID);
+        dest.writeFloat(this.remainingSeconds);
     }
 
     public void readFromParcel(Parcel source) {
+
+        this.remainingSeconds = source.readFloat();
     }
 
     public WinMessage() {
     }
 
     protected WinMessage(Parcel in) {
+        in.readByte(); // dropped
+        this.remainingSeconds = in.readFloat();
+    }
+
+    public float getRemainingSeconds() {
+        return remainingSeconds;
+    }
+
+    public void setRemainingSeconds(float remainingSeconds) {
+        this.remainingSeconds = remainingSeconds;
     }
 
     public static final Parcelable.Creator<WinMessage> CREATOR = new Parcelable.Creator<WinMessage>() {

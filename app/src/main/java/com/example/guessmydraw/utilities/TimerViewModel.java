@@ -9,15 +9,15 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class TimerModelView extends ViewModel {
+public class TimerViewModel extends ViewModel {
 
-    private final static String TAG = "TimerModelView";
+    private final static String TAG = "TimerViewModel";
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final MutableLiveData<Long> timerLiveData = new MutableLiveData<>(60000L);
     private CountDownTimer countDownTimer;
 
-    public TimerModelView() {}
+    public TimerViewModel() {}
 
     public LiveData<Long> getTimerLiveData() {
         return timerLiveData;

@@ -78,7 +78,8 @@ public class Receiver extends Thread {
                 }
                 else if (type == WinMessage.NET_ID) {
                     Log.d(TAG, "packet WinMessage received.");
-                    callback.onWinMessageReceived();
+                    float remainingSeconds = ParcelableUtil.unmarshall(bf, WinMessage.CREATOR).getRemainingSeconds();
+                    callback.onWinMessageReceived(remainingSeconds);
                 }
                 else if (type == TimerExpiredMessage.NET_ID) {
                     Log.d(TAG, "packet TimerExpiredMessage received.");

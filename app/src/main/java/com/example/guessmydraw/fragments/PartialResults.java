@@ -28,6 +28,7 @@ import com.example.guessmydraw.utilities.DisconnectionDialog;
 import com.example.guessmydraw.utilities.GameViewModel;
 
 import java.net.InetAddress;
+import java.util.Locale;
 
 public class PartialResults extends Fragment implements NetworkEventCallback {
 
@@ -69,13 +70,19 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
         TextView p1Name = binding.p1Name;
         TextView p2Name = binding.p2Name;
 
+        TextView bonusTextView = binding.bonus;
+
         p1Name.setText(gameViewModel.getPlayersName());
         p2Name.setText(gameViewModel.getOpponentsName());
 
         Log.d(TAG, "score 1: " + gameViewModel.getScorePlayerOne());
         Log.d(TAG, "score 2: " + gameViewModel.getScorePlayerTwo());
-        scorePlayerOneTextView.setText(String.valueOf(gameViewModel.getScorePlayerOne()));
-        scorePlayerTwoTextView.setText(String.valueOf(gameViewModel.getScorePlayerTwo()));
+
+        scorePlayerOneTextView.setText(String.format(Locale.ENGLISH, "%.1f", gameViewModel.getScorePlayerOne()));
+        scorePlayerTwoTextView.setText(String.format(Locale.ENGLISH, "%.1f", gameViewModel.getScorePlayerTwo()));
+
+        bonusTextView.setText(String.format(Locale.ENGLISH, "%.1f", gameViewModel.getLastBonus()));
+
 
         this.endMatchButton = binding.endMatchButton;
         int n = gameViewModel.getEndGameRequests();
@@ -156,7 +163,7 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
     public void onAnswerMessageReceived(String answer) {/*EMPTY*/}
 
     @Override
-    public void onWinMessageReceived() {/*EMPTY*/}
+    public void onWinMessageReceived(float remainingSeconds) {/*EMPTY*/}
 
     @Override
     public void onTimerExpiredMessage() {/*EMPTY*/}

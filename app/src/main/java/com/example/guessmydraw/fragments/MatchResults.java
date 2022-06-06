@@ -50,8 +50,8 @@ public class MatchResults extends Fragment {
         binding = FragmentMatchResultsBinding.inflate(inflater, container, false);
 
         TextView textView = binding.resultText;
-        int score1 = gameViewModel.getScorePlayerOne();
-        int score2 = gameViewModel.getScorePlayerTwo();
+        float score1 = gameViewModel.getScorePlayerOne();
+        float score2 = gameViewModel.getScorePlayerTwo();
 
         if (score1 > score2){
             textView.setText(R.string.you_win);

@@ -47,4 +47,5 @@
     <string name="end_match_request_reached">Requests to end the game reached.</string>
     <string name="opponent_did_not_guess">Your opponent guessed right.</string>
     <string name="connecting">Connecting...</string>
+    <string name="missing_requirements">The device does not support all the necessary requirements.</string>
 </resources>

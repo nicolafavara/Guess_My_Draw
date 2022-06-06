@@ -6,7 +6,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.SavedStateHandle;
 
 /**
  * ViewModel used to save all the data needed to allow the proper execution of a match
@@ -32,8 +31,9 @@ public class GameViewModel extends AndroidViewModel {
     // the player has requested to end the game
     private boolean endRequestFlag;
 
-    private int scorePlayerOne;
-    private int scorePlayerTwo;
+    private float scorePlayerOne;
+    private float scorePlayerTwo;
+    private float lastBonus;
     private int roundNumber;
 
     // number of requests saved to end the game
@@ -65,6 +65,7 @@ public class GameViewModel extends AndroidViewModel {
         scorePlayerTwo = 0;
         roundNumber = 0;
         endGameRequests = 0;
+        lastBonus = 0;
         opponentsName = null;
         opponentAddress = null;
         choosenWord = null;
@@ -121,20 +122,32 @@ public class GameViewModel extends AndroidViewModel {
         this.opponentsName = opponentsName;
     }
 
-    public int getScorePlayerOne() {
+    public float getLastBonus() {
+        return lastBonus;
+    }
+
+    private void setLastBonus(float lastBonus) {
+        this.lastBonus = lastBonus;
+    }
+
+    public float getScorePlayerOne() {
         return scorePlayerOne;
     }
 
-    public void updateScorePlayerOne() {
-        scorePlayerOne++;
+    public void updateScorePlayerOne(float remainingSeconds) {
+        float bonus = remainingSeconds/50;
+        setLastBonus(bonus);
+        scorePlayerOne = scorePlayerOne + 1 + bonus;
     }
 
-    public int getScorePlayerTwo() {
+    public float getScorePlayerTwo() {
         return scorePlayerTwo;
     }
 
-    public void updateScorePlayerTwo() {
-        scorePlayerTwo++;
+    public void updateScorePlayerTwo(float remainingSeconds) {
+        float bonus = remainingSeconds/50;
+        setLastBonus(bonus);
+        scorePlayerTwo = scorePlayerTwo + 1 + bonus;
     }
 
     public String getChoosenWord() {

@@ -157,7 +157,7 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
     public void onAnswerMessageReceived(String answer) {/*EMPTY*/}
 
     @Override
-    public void onWinMessageReceived() {/*EMPTY*/}
+    public void onWinMessageReceived(float remainingSeconds) {/*EMPTY*/}
 
     @Override
     public void onTimerExpiredMessage() {/*EMPTY*/}

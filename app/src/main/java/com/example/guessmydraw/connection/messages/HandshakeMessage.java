@@ -24,6 +24,7 @@ public class HandshakeMessage implements Parcelable {
     }
 
     public void readFromParcel(Parcel source) {
+
         this.playersName = source.readString();
     }
 

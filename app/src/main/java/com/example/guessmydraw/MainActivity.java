@@ -56,8 +56,11 @@ public class MainActivity extends AppCompatActivity
     // non ha senso re-instanziare più volte dato che si avrebbe un overhead
     // (spreco di risorse per chiamare il garbage collection)
 
-    // receiver and senders
+    // receiver used to receive message from opponent
     private static final Receiver receiver = new Receiver();
+
+    // two senders to send the message to the opponent, mainSender to send
+    // the message once, and mainSenderInLoop to send the message in a loop until it is stopped.
     private static final Sender mainSender = new Sender();
     private static final SenderInLoop mainSenderInLoop = new SenderInLoop();
 
@@ -90,8 +93,8 @@ public class MainActivity extends AppCompatActivity
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
         if (!checkWifiP2pRequirements()) {
-            // TODO RIMUOVERE
-            // finish();
+            //TODO CAMBIA
+            Toast.makeText(this, R.string.missing_requirements, Toast.LENGTH_SHORT).show();
         }
 
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);

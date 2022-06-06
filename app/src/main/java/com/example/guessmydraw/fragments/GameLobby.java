@@ -246,7 +246,7 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     public void onHandshakeMessageReceived(InetAddress address, String opponentsName) { /*EMPTY*/}
 
     @Override
-    public void onWinMessageReceived() {/*EMPTY*/}
+    public void onWinMessageReceived(float remainingSeconds) {/*EMPTY*/}
 
     @Override
     public void onTimerExpiredMessage() {/*EMPTY*/}
