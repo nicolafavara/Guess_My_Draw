@@ -110,9 +110,6 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
                 //sends a packet to the group owner to let him know the IP address of the peer
                 sendHandshakeMessage(true);
             }
-            else{
-                Log.d(TAG, "nooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
-            }
         }
     }
 

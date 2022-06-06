@@ -226,8 +226,8 @@ public class GameLobby extends Fragment implements NetworkEventCallback, View.On
 
     @Override
     public void onEndingMessageReceived() {
-        //this message can be received here if the other player is still in the partial result fragment
-        //and click on the End match button
+        // this message can be received here if the other player is still in the partial result fragment
+        // and click on the End match button
         int n = gameViewModel.askToEndGame();
         if (n == 2){
             mainHandler.post(() -> {
