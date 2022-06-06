@@ -128,6 +128,7 @@ import java.net.InetAddress;
      public void onWinMessageReceived(float remainingSeconds) {
 
          gameViewModel.updateScorePlayerTwo(remainingSeconds);
+         gameViewModel.setWordGuessedFlag(true);
 
          mainHandler.post(()->{
              Toast.makeText(requireActivity(), R.string.opponent_guessed, Toast.LENGTH_LONG).show();

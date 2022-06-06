@@ -13,7 +13,7 @@ import com.example.guessmydraw.R;
 import com.example.guessmydraw.fragments.DeviceList;
 
 /**
- * Disconnectio dialog to be showed during a match when player press back button
+ * Disconnection dialog to be showed during a match when player press back button
  */
 public class DisconnectionDialog extends DialogFragment {
 

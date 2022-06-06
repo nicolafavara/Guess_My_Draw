@@ -20,10 +20,12 @@ import com.example.guessmydraw.databinding.FragmentNewWordBinding;
 import com.example.guessmydraw.wordViewModel.Word;
 import com.example.guessmydraw.wordViewModel.WordViewModel;
 
-public class NewWord extends Fragment {
+public class NewWord extends Fragment implements View.OnClickListener{
 
     private FragmentNewWordBinding binding;
     private WordViewModel wordViewModel;
+
+    private EditText editText;
 
     public NewWord() {}
 
@@ -37,22 +39,9 @@ public class NewWord extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentNewWordBinding.inflate(inflater, container, false);
 
-        EditText editText = binding.editWord;
-        final Button button = binding.buttonSave;
-
         wordViewModel = new ViewModelProvider(this).get(WordViewModel.class);
-
-
-        button.setOnClickListener(view -> {
-            if (TextUtils.isEmpty(editText.getText())) {
-                Toast.makeText(requireContext(), R.string.empty_word_not_saved, Toast.LENGTH_LONG).show();
-            }
-            else {
-                Word word = new Word(editText.getText().toString());
-                wordViewModel.insert(word);
-                NavHostFragment.findNavController(this).navigate(R.id.return_to_word_list);
-            }
-        });
+        editText = binding.editWord;
+        binding.buttonSave.setOnClickListener(this);
 
         return binding.getRoot();
     }
@@ -63,5 +52,21 @@ public class NewWord extends Fragment {
         // Hide status bar
         View windowDecorView = requireActivity().getWindow().getDecorView();
         windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        if(v.getId() == R.id.button_save){
+
+            if (TextUtils.isEmpty(editText.getText())) {
+                Toast.makeText(requireContext(), R.string.empty_word_not_saved, Toast.LENGTH_LONG).show();
+            }
+            else {
+                Word word = new Word(editText.getText().toString());
+                wordViewModel.insert(word);
+                NavHostFragment.findNavController(this).navigate(R.id.return_to_word_list);
+            }
+        }
     }
 }

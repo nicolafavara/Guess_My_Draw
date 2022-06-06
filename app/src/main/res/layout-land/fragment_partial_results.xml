@@ -101,7 +101,7 @@
             android:textSize="38sp" />
 
         <TextView
-            android:id="@+id/bonus"
+            android:id="@+id/bonus_value"
             style="@style/Widget.AppCompat.TextView"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

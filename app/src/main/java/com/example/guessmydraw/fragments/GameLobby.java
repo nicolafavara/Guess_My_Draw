@@ -35,7 +35,7 @@ import com.example.guessmydraw.utilities.GameViewModel;
 
 import java.net.InetAddress;
 
-public class GameLobby extends Fragment implements NetworkEventCallback {
+public class GameLobby extends Fragment implements NetworkEventCallback, View.OnClickListener{
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final String TAG = "GAME_LOBBY";
@@ -88,24 +88,11 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
         chooseWordButton = binding.chooseWordButton;
         chooseWordButton.setEnabled(true);
         chooseWordButton.setVisibility(View.INVISIBLE);
-        chooseWordButton.setOnClickListener(view -> {
-            NavHostFragment.findNavController(this).navigate(R.id.start_word_list);
-        });
+        chooseWordButton.setOnClickListener(this);
 
         playButton = binding.playButton;
         playButton.setEnabled(false);
-        playButton.setOnClickListener(view -> {
-
-            Log.d(TAG, "isMyTurnToDraw " +  gameViewModel.getMyTurnToDraw() + ". ");
-            if (gameViewModel.getMyTurnToDraw()){
-                if (chosenWord != null){
-                    NavHostFragment.findNavController(this).navigate(R.id.start_current_player_games);
-                }
-            }
-            else{
-                NavHostFragment.findNavController(this).navigate(R.id.start_other_player_games);
-            }
-        });
+        playButton.setOnClickListener(this);
         return binding.getRoot();
     }
 
@@ -254,4 +241,25 @@ public class GameLobby extends Fragment implements NetworkEventCallback {
     @Override
     public void onDrawMessageReceived(DrawMessage msg) {/*EMPTY*/}
 
+    @Override
+    public void onClick(View v) {
+
+        if(v.getId() == R.id.choose_word_button){
+            NavHostFragment.findNavController(this).navigate(R.id.start_word_list);
+        }
+        else if(v.getId() == R.id.play_button){
+            handlePlayButton();
+        }
+    }
+
+    private void handlePlayButton() {
+        Log.d(TAG, "isMyTurnToDraw " + gameViewModel.getMyTurnToDraw() + ". ");
+        if (gameViewModel.getMyTurnToDraw()) {
+            if (chosenWord != null) {
+                NavHostFragment.findNavController(this).navigate(R.id.start_current_player_games);
+            }
+        } else {
+            NavHostFragment.findNavController(this).navigate(R.id.start_other_player_games);
+        }
+    }
 }

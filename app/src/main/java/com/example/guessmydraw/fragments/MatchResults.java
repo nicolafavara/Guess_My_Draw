@@ -18,7 +18,7 @@ import com.example.guessmydraw.databinding.FragmentMatchResultsBinding;
 import com.example.guessmydraw.utilities.DisconnectionDialog;
 import com.example.guessmydraw.utilities.GameViewModel;
 
-public class MatchResults extends Fragment {
+public class MatchResults extends Fragment implements View.OnClickListener{
 
     private FragmentMatchResultsBinding binding;
 
@@ -64,9 +64,7 @@ public class MatchResults extends Fragment {
         }
 
         Button button = binding.returnToFirstScreenButton;
-        button.setOnClickListener(view -> {
-            NavHostFragment.findNavController(this).navigate(R.id.return_to_first_screen);
-        });
+        button.setOnClickListener(this);
         return binding.getRoot();
     }
 
@@ -76,5 +74,13 @@ public class MatchResults extends Fragment {
         // Hide status bar
         View windowDecorView = requireActivity().getWindow().getDecorView();
         windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        if(v.getId() == R.id.return_to_first_screen_button){
+            NavHostFragment.findNavController(this).navigate(R.id.return_to_first_screen);
+        }
     }
 }

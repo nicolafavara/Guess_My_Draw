@@ -21,7 +21,7 @@ import com.example.guessmydraw.utilities.GameViewModel;
 
 import java.util.Objects;
 
-public class FirstScreen extends Fragment {
+public class FirstScreen extends Fragment implements View.OnClickListener{
 
     private FragmentFirstScreenBinding binding;
     private EditText playersNameEditText;
@@ -40,26 +40,8 @@ public class FirstScreen extends Fragment {
 
         playersNameEditText = binding.playerName;
 
-        binding.discoverButton.setOnClickListener(view -> {
-            String name = playersNameEditText.getText().toString();
-            if(!name.equals("")){
-                GameViewModel gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
-                gameViewModel.setPlayersName(name);
-
-                ((FirstScreenListener) requireActivity()).startDiscovery();
-            }
-            else{
-                Toast.makeText(requireActivity(), R.string.insert_name_string, Toast.LENGTH_LONG).show();
-            }
-        });
-
-        binding.showWordButton.setOnClickListener(view -> {
-
-            String fragmentLabel = ((MainActivity) requireActivity()).getForegroundFragmentLabel();
-            if (fragmentLabel.equals(requireContext().getString(R.string.first_screen_label))){
-                NavHostFragment.findNavController(this).navigate(R.id.show_word_list);
-            }
-        });
+        binding.discoverButton.setOnClickListener(this);
+        binding.showWordButton.setOnClickListener(this);
 
         return binding.getRoot();
     }
@@ -70,6 +52,38 @@ public class FirstScreen extends Fragment {
         // Hide status bar
         View windowDecorView = requireActivity().getWindow().getDecorView();
         windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        if(v.getId() == R.id.discover_button){
+            handleDiscoveryButton(v);
+        }
+        else if(v.getId() == R.id.show_word_button){
+            handleShowWordButton();
+        }
+    }
+
+    private void handleShowWordButton() {
+        String fragmentLabel = ((MainActivity) requireActivity()).getForegroundFragmentLabel();
+        if (fragmentLabel.equals(requireContext().getString(R.string.first_screen_label))) {
+            NavHostFragment.findNavController(this).navigate(R.id.show_word_list);
+        }
+    }
+
+    private void handleDiscoveryButton(View v) {
+
+        String name = playersNameEditText.getText().toString();
+        if(!name.equals("")){
+            GameViewModel gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
+            gameViewModel.setPlayersName(name);
+
+            ((FirstScreenListener) requireActivity()).startDiscovery();
+        }
+        else{
+            Toast.makeText(requireActivity(), R.string.insert_name_string, Toast.LENGTH_LONG).show();
+        }
     }
 
     public interface FirstScreenListener {

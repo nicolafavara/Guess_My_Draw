@@ -30,7 +30,7 @@ import com.example.guessmydraw.utilities.GameViewModel;
 import java.net.InetAddress;
 import java.util.Locale;
 
-public class PartialResults extends Fragment implements NetworkEventCallback {
+public class PartialResults extends Fragment implements NetworkEventCallback, View.OnClickListener{
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final static String TAG = "PARTIAL_RESULTS";
@@ -69,22 +69,43 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
         TextView scorePlayerTwoTextView = binding.scorePlayerTwo;
         TextView p1Name = binding.p1Name;
         TextView p2Name = binding.p2Name;
-
-        TextView bonusTextView = binding.bonus;
+        TextView bonusTextView = binding.bonusValue;
 
         p1Name.setText(gameViewModel.getPlayersName());
         p2Name.setText(gameViewModel.getOpponentsName());
 
-        Log.d(TAG, "score 1: " + gameViewModel.getScorePlayerOne());
-        Log.d(TAG, "score 2: " + gameViewModel.getScorePlayerTwo());
-
         scorePlayerOneTextView.setText(String.format(Locale.ENGLISH, "%.1f", gameViewModel.getScorePlayerOne()));
         scorePlayerTwoTextView.setText(String.format(Locale.ENGLISH, "%.1f", gameViewModel.getScorePlayerTwo()));
 
-        bonusTextView.setText(String.format(Locale.ENGLISH, "%.1f", gameViewModel.getLastBonus()));
+        if(gameViewModel.isWordGuessedFlag()){
+            bonusTextView.setVisibility(View.VISIBLE);
+            bonusTextView.setText(String.format(Locale.ENGLISH, "%.1f", gameViewModel.getLastBonus()));
+            binding.bonusText.setVisibility(View.VISIBLE);
+        }
+        else{
+            bonusTextView.setVisibility(View.INVISIBLE);
+            binding.bonusText.setVisibility(View.INVISIBLE);
+        }
 
+        endMatchButton = binding.endMatchButton;
+        updateEndMatchButton();
+        endMatchButton.setOnClickListener(this);
 
-        this.endMatchButton = binding.endMatchButton;
+        Button returnToLobbyButton = binding.returnToLobbyButton;
+        returnToLobbyButton.setOnClickListener(this);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Hide status bar
+        View windowDecorView = requireActivity().getWindow().getDecorView();
+        windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+    private void updateEndMatchButton() {
+
         int n = gameViewModel.getEndGameRequests();
         if (n != 0){
             if(gameViewModel.isEndRequestFlag()){
@@ -98,28 +119,21 @@ public class PartialResults extends Fragment implements NetworkEventCallback {
                 }
             });
         }
-        this.endMatchButton.setOnClickListener(view -> {
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        if(v.getId() == R.id.end_match_button){
             sendEndingMessage();
             requestEndMatch();
             gameViewModel.setEndRequestFlag(true);
             this.endMatchButton.setEnabled(false);
-        });
-
-        Button returnToLobbyButton = binding.returnToLobbyButton;
-        returnToLobbyButton.setOnClickListener(view -> {
-
+        }
+        else if(v.getId() == R.id.return_to_lobby_button){
             gameViewModel.setNextRound();
             NavHostFragment.findNavController(this).navigate(R.id.return_to_lobby);
-        });
-        return binding.getRoot();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Hide status bar
-        View windowDecorView = requireActivity().getWindow().getDecorView();
-        windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+        }
     }
 
     private void sendEndingMessage() {

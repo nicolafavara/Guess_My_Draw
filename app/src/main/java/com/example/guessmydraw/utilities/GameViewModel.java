@@ -31,6 +31,9 @@ public class GameViewModel extends AndroidViewModel {
     // the player has requested to end the game
     private boolean endRequestFlag;
 
+    // flag used to indicate that the word was guessed in the current round
+    private boolean wordGuessedFlag;
+
     private float scorePlayerOne;
     private float scorePlayerTwo;
     private float lastBonus;
@@ -61,6 +64,7 @@ public class GameViewModel extends AndroidViewModel {
         endRequestFlag = false;
         ackMessageFlag = false;
         startDrawFlag = false;
+        wordGuessedFlag = false;
         scorePlayerOne = 0;
         scorePlayerTwo = 0;
         roundNumber = 0;
@@ -82,6 +86,7 @@ public class GameViewModel extends AndroidViewModel {
         endRequestFlag = false;
         ackMessageFlag = false;
         startDrawFlag = false;
+        wordGuessedFlag = false;
         choosenWord = null;
         bitmap = null;
     }
@@ -120,6 +125,14 @@ public class GameViewModel extends AndroidViewModel {
 
     public void setOpponentsName(String opponentsName) {
         this.opponentsName = opponentsName;
+    }
+
+    public boolean isWordGuessedFlag() {
+        return wordGuessedFlag;
+    }
+
+    public void setWordGuessedFlag(boolean wordGuessedFlag) {
+        this.wordGuessedFlag = wordGuessedFlag;
     }
 
     public float getLastBonus() {

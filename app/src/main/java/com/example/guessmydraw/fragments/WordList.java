@@ -19,14 +19,12 @@ import com.example.guessmydraw.wordViewModel.WordListAdapter;
 import com.example.guessmydraw.wordViewModel.WordViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class WordList extends Fragment {
+public class WordList extends Fragment implements View.OnClickListener{
 
     private FragmentWordListBinding binding;
     private WordViewModel wordViewModel;
 
-    public WordList() {
-        // Required empty public constructor
-    }
+    public WordList() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,9 +49,7 @@ public class WordList extends Fragment {
         });
 
         FloatingActionButton fab = binding.fab;
-        fab.setOnClickListener( view -> {
-            NavHostFragment.findNavController(this).navigate(R.id.add_new_word);
-        });
+        fab.setOnClickListener(this);
 
         return binding.getRoot();
     }
@@ -64,5 +60,13 @@ public class WordList extends Fragment {
         // Hide status bar
         View windowDecorView = requireActivity().getWindow().getDecorView();
         windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        if(v.getId() == R.id.fab){
+            NavHostFragment.findNavController(this).navigate(R.id.add_new_word);
+        }
     }
 }

@@ -30,7 +30,7 @@ import com.example.guessmydraw.utilities.DisconnectionDialog;
 import com.example.guessmydraw.utilities.GameViewModel;
 import com.example.guessmydraw.utilities.TimerViewModel;
 
- public class CanvasOtherPlayer extends Fragment implements OtherPlayerCanvasView.canvasViewCallback{
+ public class CanvasOtherPlayer extends Fragment implements OtherPlayerCanvasView.canvasViewCallback, View.OnClickListener{
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
      private final static String TAG = "CanvasOtherPlayer";
@@ -95,28 +95,7 @@ import com.example.guessmydraw.utilities.TimerViewModel;
             }
         });
 
-        binding.sendButton.setOnClickListener(view -> {
-            String answer = binding.answerEditText.getText().toString();
-            if(!answer.equals("")){
-
-                if(this.rightAnswer.equalsIgnoreCase(answer)){
-
-                    float remainingSeconds = Integer.parseInt(timerTextView.getText().toString());
-                    timerViewModel.cancelTimer();
-                    gameViewModel.updateScorePlayerOne(remainingSeconds);
-                    sendWinMessage(remainingSeconds);
-                    mainHandler.post(()->{
-                        Toast.makeText(getContext(), R.string.you_guessed, Toast.LENGTH_SHORT).show();
-                    });
-                    NavHostFragment.findNavController(this).navigate(R.id.end_round);
-                }
-                else{
-                    mainHandler.post(()->{
-                        Toast.makeText(getContext(), R.string.retry, Toast.LENGTH_SHORT).show();
-                    });
-                }
-            }
-        });
+        binding.sendButton.setOnClickListener(this);
 
         return binding.getRoot();
     }
@@ -163,4 +142,36 @@ import com.example.guessmydraw.utilities.TimerViewModel;
          timerViewModel.requestTimer();
      }
 
+     @Override
+     public void onClick(View v) {
+
+        if(v.getId() == R.id.send_button){
+            handleSendButton();
+        }
+     }
+
+     private void handleSendButton() {
+
+         String answer = binding.answerEditText.getText().toString();
+         if(!answer.equals("")){
+
+             if(this.rightAnswer.equalsIgnoreCase(answer)){
+
+                 float remainingSeconds = Integer.parseInt(timerTextView.getText().toString());
+                 timerViewModel.cancelTimer();
+                 gameViewModel.updateScorePlayerOne(remainingSeconds);
+                 gameViewModel.setWordGuessedFlag(true);
+                 sendWinMessage(remainingSeconds);
+                 mainHandler.post(()->{
+                     Toast.makeText(getContext(), R.string.you_guessed, Toast.LENGTH_SHORT).show();
+                 });
+                 NavHostFragment.findNavController(this).navigate(R.id.end_round);
+             }
+             else{
+                 mainHandler.post(()->{
+                     Toast.makeText(getContext(), R.string.retry, Toast.LENGTH_SHORT).show();
+                 });
+             }
+         }
+     }
  }
