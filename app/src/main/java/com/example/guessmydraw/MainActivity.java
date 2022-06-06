@@ -4,7 +4,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavDestination;
@@ -25,15 +24,14 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.example.guessmydraw.connection.MessageReader;
 import com.example.guessmydraw.connection.NetworkEventCallback;
-import com.example.guessmydraw.connection.Receiver;
 import com.example.guessmydraw.connection.Sender;
 import com.example.guessmydraw.connection.SenderInLoop;
 import com.example.guessmydraw.databinding.ActivityMainBinding;
 import com.example.guessmydraw.fragments.DeviceList;
 import com.example.guessmydraw.fragments.FirstScreen;
 import com.example.guessmydraw.fragments.Loading;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -53,11 +51,10 @@ public class MainActivity extends AppCompatActivity
     private boolean isWifiP2pEnabled = false;
     protected boolean isWifiP2pConnected = false;
 
+    //TODO RIMUOVI
     // non ha senso re-instanziare più volte dato che si avrebbe un overhead
     // (spreco di risorse per chiamare il garbage collection)
-
-    // receiver used to receive message from opponent
-    private static final Receiver receiver = new Receiver();
+    private static final MessageReader msgReceiver = new MessageReader();
 
     // two senders to send the message to the opponent, mainSender to send
     // the message once, and mainSenderInLoop to send the message in a loop until it is stopped.
@@ -99,8 +96,8 @@ public class MainActivity extends AppCompatActivity
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
 
-        if (!receiver.isAlive()){
-            receiver.start();   //start the receiver thread 
+        if (!msgReceiver.isAlive()){
+            msgReceiver.start();   //start the receiver thread
         }
     }
 
@@ -311,7 +308,7 @@ public class MainActivity extends AppCompatActivity
     // region senders and receiver methods
 
     public void registerForReceiver(@NonNull NetworkEventCallback callback){
-        receiver.setNetworkEventCallback(callback);
+        msgReceiver.setNetworkEventCallback(callback);
     }
 
     public void initSenders(@NotNull String address){

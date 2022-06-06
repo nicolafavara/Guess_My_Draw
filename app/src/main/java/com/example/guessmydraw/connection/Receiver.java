@@ -1,5 +1,6 @@
 package com.example.guessmydraw.connection;
 
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * class representing the thread used to stay on listening for incoming messages
@@ -27,14 +30,16 @@ public class Receiver extends Thread {
     public static final int RECEIVER_PORT = 5555;
     private static final int BUFF_SIZE = 4096;
 
-
-    private NetworkEventCallback callback;
+    private final static Queue<DatagramPacket> enqueuedMessages = new LinkedList<>();
 
     public Receiver(){}
 
-    public void setNetworkEventCallback(@NonNull NetworkEventCallback callback){
-        Log.d(TAG, "setNetworkEventCallback");
-        this.callback = callback;
+    public DatagramPacket getPacket(){
+        DatagramPacket packet;
+        synchronized (enqueuedMessages){
+            packet = enqueuedMessages.poll();
+        }
+        return packet;
     }
 
     @Override
@@ -49,56 +54,12 @@ public class Receiver extends Thread {
                 byte[] buffer = new byte[BUFF_SIZE];
                 DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
 
-                Log.e(TAG, "waiting for message...");
+                Log.d(TAG, "waiting for message...");
                 client.receive(receivedPacket);
-                Log.e(TAG, "Message received.");
+                Log.d(TAG, "Message received.");
 
-                byte[] bf = receivedPacket.getData();
-                byte type = bf[0];
-
-                if (callback == null){
-                    Log.e(TAG, "Callback is null.");
-                    continue;
-                }
-
-                if (type == DrawMessage.NET_ID) {
-                    Log.d(TAG, "packet DrawMessage received.");
-                    DrawMessage receivedMessage = ParcelableUtil.unmarshall(bf, DrawMessage.CREATOR);
-                    callback.onDrawMessageReceived(receivedMessage);
-                }
-                else if (type == HandshakeMessage.NET_ID) {
-                    Log.d(TAG, "packet HandshakeMessage received.");
-                    String opponentsName = ParcelableUtil.unmarshall(bf, HandshakeMessage.CREATOR).getPlayersName();
-                    callback.onHandshakeMessageReceived(receivedPacket.getAddress(), opponentsName);
-                }
-                else if (type == AnswerMessage.NET_ID) {
-                    Log.d(TAG, "packet AnswerMessage received.");
-                    String answer = ParcelableUtil.unmarshall(bf, AnswerMessage.CREATOR).getAnswer();
-                    callback.onAnswerMessageReceived(answer);
-                }
-                else if (type == WinMessage.NET_ID) {
-                    Log.d(TAG, "packet WinMessage received.");
-                    float remainingSeconds = ParcelableUtil.unmarshall(bf, WinMessage.CREATOR).getRemainingSeconds();
-                    callback.onWinMessageReceived(remainingSeconds);
-                }
-                else if (type == TimerExpiredMessage.NET_ID) {
-                    Log.d(TAG, "packet TimerExpiredMessage received.");
-                    callback.onTimerExpiredMessage();
-                }
-                else if (type == EndMatchRequestMessage.NET_ID) {
-                    Log.d(TAG, "packet EndMatchRequestMessage received.");
-                    callback.onEndingMessageReceived();
-                }
-                else if (type == AckMessage.NET_ID) {
-                    Log.d(TAG, "packet AckMessage received.");
-                    callback.onAckMessageReceived();
-                }
-                else if (type == StartDrawMessage.NET_ID) {
-                    Log.d(TAG, "packet StartDrawMessage received.");
-                    callback.onStartDrawMessageReceived();
-                }
-                else {
-                    throw new RuntimeException("Unknown NET ID!");
+                synchronized (enqueuedMessages){
+                    enqueuedMessages.add(receivedPacket);
                 }
             }
         }
