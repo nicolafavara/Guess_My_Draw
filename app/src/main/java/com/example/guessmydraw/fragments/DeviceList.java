@@ -29,9 +29,7 @@ public class DeviceList extends Fragment implements WifiP2pManager.PeerListListe
     private SwipeRefreshLayout swipeRefreshLayout;
     private RVAdapter adapter;
 
-    public DeviceList() {
-        // Required empty public constructor
-    }
+    public DeviceList() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

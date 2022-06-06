@@ -37,6 +37,7 @@ public class Loading extends Fragment implements WifiP2pManager.ConnectionInfoLi
     private final static String TAG = "LOADING_FRAGMENT";
     private FragmentLoadingBinding binding;
 
+    // viewModel used to save all the information needed for the match
     private GameViewModel gameViewModel;
 
     public Loading() {}

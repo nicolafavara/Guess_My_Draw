@@ -93,7 +93,6 @@ public class MainActivity extends AppCompatActivity
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
         if (!checkWifiP2pRequirements()) {
-            //TODO CAMBIA
             Toast.makeText(this, R.string.missing_requirements, Toast.LENGTH_SHORT).show();
         }
 
@@ -291,7 +290,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onSuccess() {
                 String fragmentLabel = getForegroundFragmentLabel();
-                if (!fragmentLabel.equals(getResources().getString(R.string.match_results_label))){
+                if (!fragmentLabel.equals(getResources().getString(R.string.match_results_label))
+                        && !fragmentLabel.equals(getResources().getString(R.string.first_screen_label))){
                     Navigation.findNavController(MainActivity.this, R.id.my_nav_host_fragment).navigate(R.id.disconnection);
                 }
                 isWifiP2pConnected = false;

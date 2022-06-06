@@ -41,14 +41,15 @@ public class GameLobby extends Fragment implements NetworkEventCallback, View.On
     private final String TAG = "GAME_LOBBY";
     private FragmentGameLobbyBinding binding;
 
+    // viewModel used to save all the information needed for the match
+    private GameViewModel gameViewModel;
+
     private Button playButton;
     private Button chooseWordButton;
 
     private MutableLiveData<String> chosenWord;
     private TextView roleTextView;
     private TextView wordTextView;
-
-    private GameViewModel gameViewModel;
 
     public GameLobby() {}
 
@@ -114,7 +115,8 @@ public class GameLobby extends Fragment implements NetworkEventCallback, View.On
             });
         });
 
-        Log.d(TAG, gameViewModel.toString());
+        //DEBUG
+        //Log.d(TAG, gameViewModel.toString());
 
         determCurrent();
         if (gameViewModel.isAckMessageFlag()){
@@ -130,6 +132,9 @@ public class GameLobby extends Fragment implements NetworkEventCallback, View.On
         windowDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
+    /**
+     * Method that changes the interface based on the player's role
+     */
     private void determCurrent(){
 
         int currRound = gameViewModel.getRoundNumber();
@@ -178,6 +183,9 @@ public class GameLobby extends Fragment implements NetworkEventCallback, View.On
         ((MainActivity)requireActivity()).sendMessageInLoop(bundle);
     }
 
+    /**
+     * Sends an ack message to let the opponent know that the word to be guessed has been received
+     */
     private void sendAck(){
         AckMessage messageToSend = new AckMessage();
         Bundle bundle = new Bundle();
@@ -187,23 +195,24 @@ public class GameLobby extends Fragment implements NetworkEventCallback, View.On
 
     @Override
     public void onAnswerMessageReceived(String answer) {
-        //TODO CHECK
         sendAck();
         gameViewModel.setAckMessageFlag(true);
 
         Log.d(TAG, "answer received (" + answer + ").");
         gameViewModel.setChoosenWord(answer);
         mainHandler.post(()->{
-            // enable button to choose word only after the current player has obtained
-            // the IP of the other player to be able to send him the correct answer
+            // we enable button only once the word to be drawn has been received
             playButton.setEnabled(true);
         });
     }
 
     @Override
     public void onAckMessageReceived() {
-        //TODO CHECK
         gameViewModel.setAckMessageFlag(true);
+
+        // by receiving the ack we are assured that the opponent got the word to guess,
+        // so we are ready to play. We can then enable the button to start the game
+        // and stop senderInLoop which is still sending the word in a loop.
         ((MainActivity)requireActivity()).stopSenderInLoop();
         mainHandler.post(()-> {
             playButton.setEnabled(true);
@@ -217,7 +226,6 @@ public class GameLobby extends Fragment implements NetworkEventCallback, View.On
 
     @Override
     public void onEndingMessageReceived() {
-        //TODO CHECK
         //this message can be received here if the other player is still in the partial result fragment
         //and click on the End match button
         int n = gameViewModel.askToEndGame();

@@ -36,7 +36,9 @@ public class PartialResults extends Fragment implements NetworkEventCallback, Vi
     private final static String TAG = "PARTIAL_RESULTS";
     private FragmentPartialResultsBinding binding;
 
+    // viewModel used to save all the information needed for the match
     private GameViewModel gameViewModel;
+
     private Button endMatchButton;
 
     public PartialResults() {}
