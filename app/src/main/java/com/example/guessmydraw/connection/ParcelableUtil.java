@@ -3,6 +3,9 @@ package com.example.guessmydraw.connection;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * TODO SCRIVI COMMENTO
+ */
 public class ParcelableUtil {
     public static byte[] marshall(Parcelable parceable) {
         Parcel parcel = Parcel.obtain();

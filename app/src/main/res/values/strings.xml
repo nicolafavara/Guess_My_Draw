@@ -53,7 +53,7 @@
     <string name="gps_required">Per trovare un giocatore nei paraggi è necessario attivare il GPS del dispositivo.</string>
     <string name="opponent_guessed">Il tuo avversario ha indovinato!</string>
     <string name="starting_discovery">Inizio ricerca</string>
-    <string name="discovery_failed">Ricerca fallita</string>
+    <string name="discovery_failed">Ricerca fallita, fai uno swipe verso il basso per aggiornare.</string>
     <string name="opponent_did_not_guess">Il tuo avversario non ha indovinato.</string>
     <string name="Timer_expired">Tempo scaduto.</string>
     <string name="you_guessed">Hai indovinato!!!</string>

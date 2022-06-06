@@ -18,6 +18,9 @@ import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * class representing the thread responsible for sending messages to the other player
+ */
 public class Sender extends Thread {
 
     public final static String TAG = "SENDER";

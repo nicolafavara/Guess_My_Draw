@@ -46,7 +46,6 @@ public class FirstScreen extends Fragment {
                 GameViewModel gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
                 gameViewModel.setPlayersName(name);
 
-                //TODO NECESSARIO???
                 ((FirstScreenListener) requireActivity()).startDiscovery();
             }
             else{
@@ -56,7 +55,6 @@ public class FirstScreen extends Fragment {
 
         binding.showWordButton.setOnClickListener(view -> {
 
-            //TODO NECESSARIO?
             String fragmentLabel = ((MainActivity) requireActivity()).getForegroundFragmentLabel();
             if (fragmentLabel.equals(requireContext().getString(R.string.first_screen_label))){
                 NavHostFragment.findNavController(this).navigate(R.id.show_word_list);

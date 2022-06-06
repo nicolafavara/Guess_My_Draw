@@ -40,7 +40,6 @@ public class OtherPlayerCanvasView extends View implements NetworkEventCallback 
 
         super(context, attrs);
 
-        setSaveEnabled(true);
         int drawColor = ResourcesCompat.getColor(this.getResources(), R.color.black, null);
 
         this.path = new Path();

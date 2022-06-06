@@ -40,9 +40,10 @@ import com.example.guessmydraw.utilities.TimerModelView;
     private String rightAnswer;
     private Bundle bundle;
 
-    //viewModel used to save all the information needed for the match
+    // viewModel used to save all the information needed for the match
     private GameViewModel gameViewModel;
-    //TODO Scrivi commento
+    // viewModel used to store the information of the timer that
+    // is in charge of counting down during a round
     private TimerModelView timerModelView;
 
     public CanvasOtherPlayer() {}
@@ -137,6 +138,7 @@ import com.example.guessmydraw.utilities.TimerModelView;
         WinMessage messageToSend = new WinMessage();
         bundle.clear();
         bundle.putParcelable(Sender.NET_MSG_ID, messageToSend);
+        Log.d(TAG, "Sending win message");
         ((MainActivity)requireActivity()).sendMessage(bundle);
     }
 

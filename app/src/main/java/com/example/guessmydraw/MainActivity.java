@@ -4,6 +4,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavDestination;
@@ -32,6 +33,7 @@ import com.example.guessmydraw.databinding.ActivityMainBinding;
 import com.example.guessmydraw.fragments.DeviceList;
 import com.example.guessmydraw.fragments.FirstScreen;
 import com.example.guessmydraw.fragments.Loading;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
     private ActivityMainBinding binding;
 
-    //p2p wifi management attributes
+    // p2p wifi management attributes
     private final IntentFilter intentFilter = new IntentFilter();
     private BroadcastReceiver broadcastReceiver = null;
     private WifiP2pManager.Channel channel;
@@ -51,7 +53,10 @@ public class MainActivity extends AppCompatActivity
     private boolean isWifiP2pEnabled = false;
     protected boolean isWifiP2pConnected = false;
 
-    //TODO COMMENTA
+    // non ha senso re-instanziare più volte dato che si avrebbe un overhead
+    // (spreco di risorse per chiamare il garbage collection)
+
+    // receiver and senders
     private static final Receiver receiver = new Receiver();
     private static final Sender mainSender = new Sender();
     private static final SenderInLoop mainSenderInLoop = new SenderInLoop();
@@ -85,8 +90,8 @@ public class MainActivity extends AppCompatActivity
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
         if (!checkWifiP2pRequirements()) {
-            //TODO RIMUOVERE
-            finish();
+            // TODO RIMUOVERE
+            // finish();
         }
 
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
@@ -167,12 +172,6 @@ public class MainActivity extends AppCompatActivity
             return false;
         }
 
-        //TODO SE LO XIAOMI HA IL WI_FI SPENTO L'APP CRASHA
-        if (!wifiManager.isP2pSupported()) {
-            Log.e(TAG, "Wi-Fi Direct is not supported by the hardware or Wi-Fi is off.");
-            return false;
-        }
-
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         if (manager == null) {
             Log.e(TAG, "Cannot get Wi-Fi Direct system service.");
@@ -190,19 +189,19 @@ public class MainActivity extends AppCompatActivity
 
     private boolean checkBeforeDiscovery(){
 
-        //Check if user is already connected with someone
+        // Check if user is already connected with someone
         if (isWifiP2pConnected){
             Toast.makeText(this, R.string.p2p_already_connected, Toast.LENGTH_LONG).show();
             disconnect();
         }
 
-        //check if WiFi is enabled
+        // check if WiFi is enabled
         if (!isWifiP2pEnabled) {
             Toast.makeText(this, R.string.p2p_off_warning, Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        //Check if GPS is enabled
+        // Check if GPS is enabled
         LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         boolean gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if(!gps_enabled) {
@@ -247,7 +246,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void refresh(){
-        //to refresh the device search, we call again the method to request again the discovery phase
+        // to refresh the device search, we call again the method to request again the discovery phase
         startDiscovery();
     }
 
@@ -304,9 +303,9 @@ public class MainActivity extends AppCompatActivity
         manager.requestConnectionInfo(channel, listener);
     }
 
-    //end region
+    // end region
 
-    //region senders and receiver methods
+    // region senders and receiver methods
 
     public void registerForReceiver(@NonNull NetworkEventCallback callback){
         receiver.setNetworkEventCallback(callback);
@@ -337,5 +336,5 @@ public class MainActivity extends AppCompatActivity
         mainSenderInLoop.stopLoop();
     }
 
-    //end region
+    // end region
 }

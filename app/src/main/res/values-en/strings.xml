@@ -38,7 +38,7 @@
     <string name="word_hint">New word…</string>
     <string name="gps_required">To find a player nearby, it is necessary to activate the device\'s GPS.</string>
     <string name="opponent_guessed">Your opponent guessed correctly</string>
-    <string name="discovery_failed">Discovery Failed</string>
+    <string name="discovery_failed">Discovery Failed, swipe down to refresh.</string>
     <string name="starting_discovery">Starting discovery...</string>
     <string name="connection_failed">Connect failed. Retry.</string>
     <string name="Timer_expired">Time expired.</string>

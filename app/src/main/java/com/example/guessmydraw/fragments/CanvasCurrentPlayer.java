@@ -1,6 +1,10 @@
  package com.example.guessmydraw.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -15,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.guessmydraw.MainActivity;
@@ -77,8 +82,8 @@ import java.net.InetAddress;
         binding = FragmentCanvasCurrentPlayerBinding.inflate(inflater, container, false);
 
         //set listener for all buttons representing a color in the palette
+        binding.eraserButton.setOnClickListener(this);
         binding.buttonColorBlack.setOnClickListener(this);
-        binding.buttonColorWhite.setOnClickListener(this);
         binding.buttonColorRed.setOnClickListener(this);
         binding.buttonColorOrange.setOnClickListener(this);
         binding.buttonColorYellow.setOnClickListener(this);
@@ -95,7 +100,6 @@ import java.net.InetAddress;
         binding.wordToDraw.setText(wordToDraw);
 
         canvasView = binding.currentPlayerCanvasView;
-        // TODO SE IL GIOCATORE CORRENTE E' ANCORA NEL PARTIAL RESULT FRAGMENT...
         if(!gameViewModel.isStartDrawFlag()){
             //if we are here the opponent is ready to receive draw message,
             // so the current player can see the canvas and start draw
@@ -163,8 +167,8 @@ import java.net.InetAddress;
          if (v.getId() == R.id.button_color_black){
              color = getResources().getColor(R.color.black);
          }
-         else if (v.getId() == R.id.button_color_white){
-             color = getResources().getColor(R.color.white);
+         else if (v.getId() == R.id.eraser_button){
+             color = getResources().getColor(R.color.colorCanvas);
          }
          else if (v.getId() == R.id.button_color_red){
              color = getResources().getColor(R.color.red);

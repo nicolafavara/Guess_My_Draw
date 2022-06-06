@@ -18,11 +18,15 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
+/**
+ * class representing the thread used to stay on listening for incoming messages
+ */
 public class Receiver extends Thread {
 
     private final static String TAG = "RECEIVER";
     public static final int RECEIVER_PORT = 5555;
     private static final int BUFF_SIZE = 4096;
+
 
     private NetworkEventCallback callback;
 

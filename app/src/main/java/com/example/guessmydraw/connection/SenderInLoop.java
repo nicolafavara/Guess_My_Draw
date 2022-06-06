@@ -8,6 +8,10 @@ import androidx.annotation.NonNull;
 import java.io.IOException;
 import java.net.DatagramPacket;
 
+/**
+ * class that extends Sender and overrides the sendPacket method
+ * in order to be able to send a message in a loop until we stop it
+ */
 public class SenderInLoop extends Sender {
 
     public final static String TAG = "SenderInLoop";

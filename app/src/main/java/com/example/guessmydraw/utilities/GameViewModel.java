@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.SavedStateHandle;
 
 /**
  * ViewModel used to save all the data needed to allow the proper execution of a match
