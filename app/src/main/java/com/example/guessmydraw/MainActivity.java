@@ -51,9 +51,6 @@ public class MainActivity extends AppCompatActivity
     private boolean isWifiP2pEnabled = false;
     protected boolean isWifiP2pConnected = false;
 
-    //TODO RIMUOVI
-    // non ha senso re-instanziare più volte dato che si avrebbe un overhead
-    // (spreco di risorse per chiamare il garbage collection)
     private static final MessageReader msgReceiver = new MessageReader();
 
     // two senders to send the message to the opponent, mainSender to send
